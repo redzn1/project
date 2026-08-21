@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LYNXIEE MARKET - 3 AI Provider Hub (/openr)</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Marked Markdown Parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-dark: #080c14;
+      --card-dark: #0f172a;
+      --card-secondary: #131d33;
+      --sidebar-dark: #0d1322;
+      --border-dark: #1e293b;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-indigo: #6366f1;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: #e2e8f0;
+    }
+
+    code, pre, .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 1);
+    }
+
+    .sidebar-btn.active {
+      background: rgba(6, 182, 212, 0.12);
+      color: #67e8f9;
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#080c14] text-slate-100 flex flex-col antialiased">
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- AUTHENTICATION SCREEN (WITH DEV PASSWORDLESS BYPASS) -->
+  <!-- ---------------------------------------------------- -->
+  <div id="authScreen" class="fixed inset-0 z-50 bg-[#080c14] flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-[#0f172a] border border-slate-700/60 p-7 sm:p-8 rounded-3xl shadow-2xl space-y-6 relative overflow-hidden">
+      <div class="flex flex-col items-center text-center space-y-3">
+        <div class="w-14 h-14 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-lg shadow-cyan-500/10">
+          <i data-lucide="terminal" class="w-7 h-7"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white tracking-tight">Developer Gateway (/openr)</h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Konfigurasi 3 Sistem Provider: OpenRouter, Mayzaa API, dan Xkiro.com
+          </p>
+        </div>
+      </div>
+
+      <!-- Dev Quick Passwordless Bypass Banner -->
+      <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-start gap-3">
+        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5"></i>
+        <div class="text-xs space-y-1">
+          <p class="font-semibold text-emerald-300">Akun Developer (Passwordless)</p>
+          <p class="text-slate-300">
+            Akun <code class="text-emerald-400 font-mono font-bold">dev@lynxie.ai</code> dapat langsung masuk tanpa memasukkan password.
+          </p>
+          <button
+            type="button"
+            onclick="handleDevBypass()"
+            id="devBypassBtn"
+            class="mt-2 w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-emerald-600/20"
+          >
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+            <span>Masuk Otomatis Sebagai Dev</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Error Box -->
+      <div id="authErrorBox" class="hidden p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-200 text-xs flex items-center gap-2">
+        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-rose-400"></i>
+        <span id="authErrorMsg">Password salah.</span>
+      </div>
+
+      <!-- Form -->
+      <form id="authForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold text-slate-400">Email Developer</label>
+          <input
+            type="email"
+            id="authEmailInput"
+            value="dev@lynxie.ai"
+            placeholder="dev@lynxie.ai"
+            class="w-full bg-[#080c14] border border-slate-700/60 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-all font-mono"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold text-slate-400">Password Kredensial (Opsional jika Dev)</label>
+          <div class="relative">
+            <input
+              type="password"
+              id="authPasswordInput"
+              placeholder="Masukkan password admin..."
+              class="w-full bg-[#080c14] border border-slate-700/60 rounded-xl px-4 pr-11 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 transition-all"
+            />
+            <button
+              type="button"
+              onclick="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white"
+            >
+              <i data-lucide="eye" id="authEyeIcon" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          id="authSubmitBtn"
+          class="w-full py-3 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-cyan-600/25"
+        >
+          <i data-lucide="lock" class="w-4 h-4"></i>
+          <span>Otorisasi & Buka Dashboard</span>
+        </button>
+      </form>
+
+      <a
+        href="/"
+        class="block w-full py-2 text-center text-xs text-slate-400 hover:text-white transition-colors"
+      >
+        ← Kembali ke Chatbot
+      </a>
+    </div>
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- MAIN DASHBOARD (LEFT SIDEBAR NAVBAR LAYOUT)          -->
+  <!-- ---------------------------------------------------- -->
+  <div id="mainDashboard" class="hidden flex-1 flex flex-col md:flex-row h-screen overflow-hidden">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-full md:w-64 lg:w-72 bg-[#0d1322] border-r border-slate-800 flex flex-col shrink-0 z-20">
+      
+      <!-- Brand Header -->
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-emerald-400 p-0.5 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <div class="w-full h-full bg-[#090d16] rounded-[10px] flex items-center justify-center">
+              <img src="/logo.svg" alt="LYNXIEE" class="w-5 h-5 object-contain" />
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-sm text-white tracking-tight">LYNXIEE</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+                /openr
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400">3 AI Provider Hub</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Provider Badge -->
+      <div class="px-4 py-2.5 bg-[#11182c] border-b border-slate-800 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-slate-400 text-[11px]">Active Engine:</span>
+        </div>
+        <span id="sidebarActiveProviderBadge" class="font-bold font-mono text-cyan-300 uppercase text-[11px] px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20">
+          MAYZAA
+        </span>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="flex-1 overflow-y-auto p-3 space-y-1 custom-scrollbar">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 py-1.5">
+          Core Controls
+        </div>
+
+        <button
+          onclick="switchTab('providers')"
+          id="navBtn-providers"
+          class="sidebar-btn active w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:bg-slate-800/60 hover:text-white"
+        >
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i>
+            <span>3 AI Providers Hub</span>
+          </div>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono">
+            3 In 1
+          </span>
+        </button>
+
+        <button
+          onclick="switchTab('dashboard')"
+          id="navBtn-dashboard"
+          class="sidebar-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:bg-slate-800/60 hover:text-white"
+        >
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
+            <span>Overview & Metrics</span>
+          </div>
+        </button>
+
+        <button
+          onclick="switchTab('models')"
+          id="navBtn-models"
+          class="sidebar-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:bg-slate-800/60 hover:text-white"
+        >
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="cpu" class="w-4 h-4 text-slate-400"></i>
+            <span>Model Catalog</span>
+          </div>
+          <span id="modelsSidebarCount" class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">
+            10+
+          </span>
+        </button>
+
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 pt-4 pb-1.5">
+          Developer Tools
+        </div>
+
+        <button
+          onclick="switchTab('tester')"
+          id="navBtn-tester"
+          class="sidebar-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:bg-slate-800/60 hover:text-white"
+        >
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="play-circle" class="w-4 h-4 text-slate-400"></i>
+            <span>Interactive Sandbox</span>
+          </div>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono">
+            Live
+          </span>
+        </button>
+
+        <button
+          onclick="switchTab('apidocs')"
+          id="navBtn-apidocs"
+          class="sidebar-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:bg-slate-800/60 hover:text-white"
+        >
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="code-2" class="w-4 h-4 text-slate-400"></i>
+            <span>API Endpoints & Docs</span>
+          </div>
+        </button>
+
+        <button
+          onclick="switchTab('config')"
+          id="navBtn-config"
+          class="sidebar-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:bg-slate-800/60 hover:text-white"
+        >
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="sliders" class="w-4 h-4 text-slate-400"></i>
+            <span>Hyperparameters</span>
+          </div>
+        </button>
+
+        <button
+          onclick="switchTab('logs')"
+          id="navBtn-logs"
+          class="sidebar-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:bg-slate-800/60 hover:text-white"
+        >
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="file-text" class="w-4 h-4 text-slate-400"></i>
+            <span>Diagnostic Logs</span>
+          </div>
+        </button>
+
+        <button
+          onclick="switchTab('security')"
+          id="navBtn-security"
+          class="sidebar-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:bg-slate-800/60 hover:text-white"
+        >
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="shield" class="w-4 h-4 text-slate-400"></i>
+            <span>Security & Dev Mode</span>
+          </div>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="p-3 border-t border-slate-800 space-y-2">
+        <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2 overflow-hidden">
+            <div class="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-xs font-bold shrink-0">
+              D
+            </div>
+            <div class="overflow-hidden">
+              <p class="text-[11px] font-semibold text-white truncate">dev@lynxie.ai</p>
+              <p class="text-[10px] text-emerald-400 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                Dev Bypass Active
+              </p>
+            </div>
+          </div>
+
+          <button
+            onclick="handleLogout()"
+            title="Logout"
+            class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors"
+          >
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <a
+          href="/"
+          class="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium flex items-center justify-center gap-2 transition-colors border border-slate-700/50"
+        >
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+          <span>Kembali ke Chatbot</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-[#080c14]">
+      
+      <!-- Content Top Header -->
+      <header class="px-6 py-3.5 border-b border-slate-800 bg-[#0b101c] flex items-center justify-between shrink-0">
+        <div>
+          <h1 id="pageTitle" class="text-base font-bold text-white flex items-center gap-2">
+            3 AI Provider Gateway Hub
+          </h1>
+          <p id="pageSubtitle" class="text-xs text-slate-400">
+            Pusat konfigurasi OpenRouter, Mayzaa API, dan Xkiro.com
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            onclick="loadAllData()"
+            class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700 text-xs flex items-center gap-1.5"
+          >
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span class="hidden sm:inline">Refresh</span>
+          </button>
+
+          <button
+            onclick="saveProviderSettings()"
+            id="saveConfigBtn"
+            class="py-2 px-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-md shadow-cyan-600/20"
+          >
+            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            <span>Simpan Perubahan</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Tab Content Container -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 custom-scrollbar">
+        
+        <!-- ---------------------------------------------------- -->
+        <!-- TAB 1: 3 AI PROVIDERS HUB                            -->
+        <!-- ---------------------------------------------------- -->
+        <section id="tab-providers" class="tab-content space-y-6 max-w-6xl mx-auto">
+          
+          <!-- Active Provider Selector -->
+          <div class="p-5 sm:p-6 rounded-2xl bg-[#0f172a] border border-slate-800 shadow-xl space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+              <div>
+                <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                  <i data-lucide="radio" class="w-4 h-4 text-cyan-400"></i>
+                  Pilih Provider AI Utama (Active Response Engine)
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  Respon chatbot dan endpoint /api/chat akan langsung dialirkan dari provider terpilih.
+                </p>
+              </div>
+              <span id="activeProviderHeaderTag" class="text-xs px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 font-mono border border-cyan-500/20">
+                Aktif: MAYZAA
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              <!-- System 1: OpenRouter -->
+              <div
+                onclick="setActiveProviderRadio('openrouter')"
+                id="card-prov-openrouter"
+                class="cursor-pointer p-4 rounded-xl border border-slate-800 bg-[#131d33] hover:border-slate-700 transition-all flex flex-col justify-between space-y-3"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center font-bold text-xs">
+                      OR
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-bold text-white">OpenRouter</h3>
+                      <p class="text-[11px] text-slate-400">Multi-Model Gateway</p>
+                    </div>
+                  </div>
+                  <input
+                    type="radio"
+                    name="activeProviderRadio"
+                    id="radio-openrouter"
+                    class="accent-cyan-500 w-4 h-4 cursor-pointer"
+                  />
+                </div>
+                <div class="text-[11px] text-slate-400 space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span>Status Kunci:</span>
+                    <span id="openRouterKeyStatusBadge" class="text-amber-400">Belum Ada</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span>Endpoint:</span>
+                    <span class="font-mono text-slate-300">/api/openr</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- System 2: Mayzaa API -->
+              <div
+                onclick="setActiveProviderRadio('mayzaa')"
+                id="card-prov-mayzaa"
+                class="cursor-pointer p-4 rounded-xl border border-emerald-500 bg-emerald-950/20 shadow-lg shadow-emerald-500/10 transition-all flex flex-col justify-between space-y-3"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                      MZ
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-bold text-white">Mayzaa API</h3>
+                      <p class="text-[11px] text-emerald-400">Free ChatGPT Direct</p>
+                    </div>
+                  </div>
+                  <input
+                    type="radio"
+                    name="activeProviderRadio"
+                    id="radio-mayzaa"
+                    checked
+                    class="accent-emerald-500 w-4 h-4 cursor-pointer"
+                  />
+                </div>
+                <div class="text-[11px] text-slate-400 space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span>Biaya:</span>
+                    <span class="text-emerald-400 font-medium">Gratis (No Key Needed)</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span>Endpoint:</span>
+                    <span class="font-mono text-slate-300">/api/ai/chat-gpt</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- System 3: Xkiro.com -->
+              <div
+                onclick="setActiveProviderRadio('xkiro')"
+                id="card-prov-xkiro"
+                class="cursor-pointer p-4 rounded-xl border border-slate-800 bg-[#131d33] hover:border-slate-700 transition-all flex flex-col justify-between space-y-3"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-500/15 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                      XK
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-bold text-white">Xkiro.com</h3>
+                      <p class="text-[11px] text-indigo-300">OpenAI-Compatible AI Gateway</p>
+                    </div>
+                  </div>
+                  <input
+                    type="radio"
+                    name="activeProviderRadio"
+                    id="radio-xkiro"
+                    class="accent-indigo-500 w-4 h-4 cursor-pointer"
+                  />
+                </div>
+                <div class="text-[11px] text-slate-400 space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span>Base URL:</span>
+                    <span class="font-mono text-slate-300 truncate max-w-[120px]">api.xkiro.com</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span>Endpoint:</span>
+                    <span class="font-mono text-slate-300">/api/xkiro</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 3 Provider Detailed Configuration Cards -->
+          <div class="space-y-6">
+            
+            <!-- 1. OpenRouter Detail Card -->
+            <div class="p-5 sm:p-6 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-cyan-500/15 text-cyan-400 flex items-center justify-center font-bold text-xs">
+                    1
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold text-white">Sistem 1: OpenRouter API Engine</h3>
+                    <p class="text-xs text-slate-400">
+                      Gateway multi-model untuk GPT-4o, Claude 3.5, DeepSeek R1, Llama 3.3
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onclick="testProviderConnection('openrouter')"
+                  id="testOpenRouterBtn"
+                  class="py-1.5 px-3 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-xs font-semibold flex items-center gap-1.5 border border-cyan-500/30"
+                >
+                  <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                  <span>Test Koneksi OpenRouter</span>
+                </button>
+              </div>
+
+              <div id="testResult-openrouter" class="hidden p-3 rounded-xl text-xs"></div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                    <span>OpenRouter API Key</span>
+                    <span id="openRouterMaskedKeyDisplay" class="text-[10px] text-emerald-400 font-mono"></span>
+                  </label>
+                  <input
+                    type="password"
+                    id="openRouterKeyInput"
+                    placeholder="sk-or-v1-..."
+                    class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 font-mono"
+                  />
+                </div>
+
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-300">Model Aktif OpenRouter</label>
+                  <select
+                    id="openRouterModelSelect"
+                    class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="openai/gpt-4o-mini">GPT-4o Mini (OpenAI) - Cepat & Stabil</option>
+                    <option value="openai/gpt-4o">GPT-4o (OpenAI) - Versi Flagship</option>
+                    <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet (Anthropic)</option>
+                    <option value="deepseek/deepseek-chat">DeepSeek V3 (DeepSeek)</option>
+                    <option value="deepseek/deepseek-r1">DeepSeek R1 Reasoning (DeepSeek)</option>
+                    <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash (Google)</option>
+                    <option value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B (Meta)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Mayzaa API Detail Card -->
+            <div class="p-5 sm:p-6 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                    2
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold text-white">Sistem 2: Mayzaa API ChatGPT Endpoint</h3>
+                    <p class="text-xs text-slate-400">
+                      Endpoint API ChatGPT publik tanpa API key (https://api.mayzaa.my.id)
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onclick="testProviderConnection('mayzaa')"
+                  id="testMayzaaBtn"
+                  class="py-1.5 px-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold flex items-center gap-1.5 border border-emerald-500/30"
+                >
+                  <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                  <span>Test Koneksi Mayzaa API</span>
+                </button>
+              </div>
+
+              <div id="testResult-mayzaa" class="hidden p-3 rounded-xl text-xs"></div>
+
+              <div class="space-y-1.5">
+                <label class="text-xs font-semibold text-slate-300">Target Endpoint URL</label>
+                <input
+                  type="text"
+                  id="mayzaaUrlInput"
+                  value="https://api.mayzaa.my.id/api/ai/chat-gpt?text="
+                  class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono"
+                />
+              </div>
+            </div>
+
+            <!-- 3. Xkiro.com Detail Card -->
+            <div class="p-5 sm:p-6 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-indigo-500/15 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                    3
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold text-white">Sistem 3: Xkiro.com AI Gateway</h3>
+                    <p class="text-xs text-slate-400">
+                      Integrasi OpenAI-compatible AI Gateway oleh Xkiro (https://api.xkiro.com/v1)
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onclick="testProviderConnection('xkiro')"
+                  id="testXkiroBtn"
+                  class="py-1.5 px-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-semibold flex items-center gap-1.5 border border-indigo-500/30"
+                >
+                  <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                  <span>Test Koneksi Xkiro</span>
+                </button>
+              </div>
+
+              <div id="testResult-xkiro" class="hidden p-3 rounded-xl text-xs"></div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-300">Xkiro Base URL</label>
+                  <input
+                    type="text"
+                    id="xkiroBaseUrlInput"
+                    value="https://api.xkiro.com/v1"
+                    class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                </div>
+
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-300 flex items-center justify-between">
+                    <span>Xkiro API Key</span>
+                    <span id="xkiroMaskedKeyDisplay" class="text-[10px] text-emerald-400 font-mono"></span>
+                  </label>
+                  <input
+                    type="password"
+                    id="xkiroKeyInput"
+                    placeholder="Bearer Key (opsional)"
+                    class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                </div>
+
+                <div class="space-y-1.5">
+                  <label class="text-xs font-semibold text-slate-300">Xkiro Target Model</label>
+                  <input
+                    type="text"
+                    id="xkiroModelInput"
+                    value="openai/gpt-4o-mini"
+                    class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ---------------------------------------------------- -->
+        <!-- TAB 2: OVERVIEW & TELEMETRY                          -->
+        <!-- ---------------------------------------------------- -->
+        <section id="tab-dashboard" class="tab-content hidden space-y-6 max-w-6xl mx-auto">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-4 rounded-2xl bg-[#0f172a] border border-slate-800">
+              <div class="text-xs text-slate-400 mb-1 flex items-center justify-between">
+                <span>System Health</span>
+                <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+              </div>
+              <div id="metricHealth" class="text-xl font-bold text-emerald-400">Operational</div>
+              <div id="metricActiveEngine" class="text-[11px] text-slate-400 mt-1">Engine: MAYZAA</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0f172a] border border-slate-800">
+              <div class="text-xs text-slate-400 mb-1 flex items-center justify-between">
+                <span>Average Latency</span>
+                <i data-lucide="clock" class="w-4 h-4 text-cyan-400"></i>
+              </div>
+              <div id="metricLatency" class="text-xl font-bold text-white">180 ms</div>
+              <div class="text-[11px] text-cyan-400 mt-1">Live Benchmark</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0f172a] border border-slate-800">
+              <div class="text-xs text-slate-400 mb-1 flex items-center justify-between">
+                <span>Total Tokens</span>
+                <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+              </div>
+              <div id="metricTokens" class="text-xl font-bold text-white">41,360</div>
+              <div class="text-[11px] text-slate-400 mt-1">In & Out Combined</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0f172a] border border-slate-800">
+              <div class="text-xs text-slate-400 mb-1 flex items-center justify-between">
+                <span>Total Requests</span>
+                <i data-lucide="globe" class="w-4 h-4 text-indigo-400"></i>
+              </div>
+              <div id="metricRequests" class="text-xl font-bold text-white">84</div>
+              <div class="text-[11px] text-emerald-400 mt-1">100% Uptime</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------- -->
+        <!-- TAB 3: MODEL CATALOG                                 -->
+        <!-- ---------------------------------------------------- -->
+        <section id="tab-models" class="tab-content hidden space-y-6 max-w-6xl mx-auto">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="relative w-full sm:w-80">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+              <input
+                type="text"
+                id="modelSearchInput"
+                oninput="renderModelsList()"
+                placeholder="Cari model AI..."
+                class="w-full bg-[#0f172a] border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500"
+              />
+            </div>
+
+            <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+              <button onclick="filterModels('ALL')" class="model-filter-btn active px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-600 text-white">Semua</button>
+              <button onclick="filterModels('OpenAI')" class="model-filter-btn px-3 py-1.5 rounded-lg text-xs bg-[#0f172a] border border-slate-800 text-slate-400 hover:text-white">OpenAI</button>
+              <button onclick="filterModels('Anthropic')" class="model-filter-btn px-3 py-1.5 rounded-lg text-xs bg-[#0f172a] border border-slate-800 text-slate-400 hover:text-white">Anthropic</button>
+              <button onclick="filterModels('DeepSeek')" class="model-filter-btn px-3 py-1.5 rounded-lg text-xs bg-[#0f172a] border border-slate-800 text-slate-400 hover:text-white">DeepSeek</button>
+            </div>
+          </div>
+
+          <div id="modelsGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Models populated dynamically by JS -->
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------- -->
+        <!-- TAB 4: INTERACTIVE PLAYGROUND                        -->
+        <!-- ---------------------------------------------------- -->
+        <section id="tab-tester" class="tab-content hidden max-w-5xl mx-auto h-[600px] flex flex-col rounded-2xl bg-[#0f172a] border border-slate-800 overflow-hidden shadow-2xl">
+          <div class="p-4 border-b border-slate-800 bg-[#121b30] flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <i data-lucide="play-circle" class="w-5 h-5 text-cyan-400"></i>
+              <div>
+                <h3 class="text-sm font-bold text-white">Live AI Test Playground</h3>
+                <p class="text-[11px] text-slate-400">Uji streaming respon dari 3 provider</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400">Engine:</span>
+              <select
+                id="testerEngineSelect"
+                class="bg-[#090d16] border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-cyan-300 font-medium focus:outline-none"
+              >
+                <option value="openrouter">OpenRouter API</option>
+                <option value="mayzaa" selected>Mayzaa API (ChatGPT)</option>
+                <option value="xkiro">Xkiro.com</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Chat Stream Area -->
+          <div id="testerMessagesList" class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar">
+            <div class="flex flex-col items-start">
+              <div class="text-[10px] text-slate-400 mb-1 px-1">System Gateway • Siap Uji</div>
+              <div class="max-w-[85%] p-3.5 rounded-2xl text-xs bg-[#141f38] text-slate-200 border border-slate-700/60 rounded-bl-none">
+                Developer Console Active. Silakan ketik prompt di bawah untuk menguji respon dari provider yang dipilih.
+              </div>
+            </div>
+          </div>
+
+          <!-- Input Box -->
+          <div class="p-3 bg-[#0d1424] border-t border-slate-800 flex items-center gap-2">
+            <input
+              type="text"
+              id="testerPromptInput"
+              onkeydown="if(event.key === 'Enter') sendTesterMessage()"
+              placeholder="Ketik pertanyaan untuk menguji respon..."
+              class="flex-1 bg-[#080c14] border border-slate-700/60 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500"
+            />
+            <button
+              onclick="sendTesterMessage()"
+              id="testerSendBtn"
+              class="p-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white transition-colors"
+            >
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------- -->
+        <!-- TAB 5: API ENDPOINTS & DOCS                          -->
+        <!-- ---------------------------------------------------- -->
+        <section id="tab-apidocs" class="tab-content hidden space-y-6 max-w-6xl mx-auto">
+          <div class="p-5 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="code-2" class="w-4 h-4 text-cyan-400"></i>
+              Daftar 3 Sistem Endpoint API Siap Pakai
+            </h3>
+            <p class="text-xs text-slate-400">
+              Endpoint ini dapat diakses langsung menggunakan GET (URL Browser) atau POST (JSON payload).
+            </p>
+          </div>
+
+          <!-- Endpoint 1 -->
+          <div class="p-5 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-cyan-400 uppercase">Sistem 1: OpenRouter API</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300">GET & POST</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#080c14] border border-slate-800 flex items-center justify-between gap-2 font-mono text-xs text-slate-300">
+              <code>GET /api/openr?text=Halo&model=openai/gpt-4o-mini</code>
+              <button onclick="copyToClipboard('/api/openr?text=Halo&model=openai/gpt-4o-mini')" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Endpoint 2 -->
+          <div class="p-5 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-400 uppercase">Sistem 2: Mayzaa API ChatGPT</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300">GET (Free)</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#080c14] border border-slate-800 flex items-center justify-between gap-2 font-mono text-xs text-slate-300">
+              <code>GET /api/ai/chat-gpt?text=Halo+Mayzaa</code>
+              <button onclick="copyToClipboard('/api/ai/chat-gpt?text=Halo+Mayzaa')" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Endpoint 3 -->
+          <div class="p-5 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-400 uppercase">Sistem 3: Xkiro.com Gateway</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300">GET & POST</span>
+            </div>
+            <div class="p-3 rounded-xl bg-[#080c14] border border-slate-800 flex items-center justify-between gap-2 font-mono text-xs text-slate-300">
+              <code>GET /api/xkiro?text=Halo+Xkiro</code>
+              <button onclick="copyToClipboard('/api/xkiro?text=Halo+Xkiro')" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------- -->
+        <!-- TAB 6: HYPERPARAMETERS                               -->
+        <!-- ---------------------------------------------------- -->
+        <section id="tab-config" class="tab-content hidden space-y-6 max-w-5xl mx-auto">
+          <div class="p-5 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-4">
+            <h3 class="text-sm font-bold text-white">System Prompt AI</h3>
+            <textarea
+              id="systemPromptInput"
+              rows="4"
+              class="w-full bg-[#080c14] border border-slate-700 rounded-xl p-3.5 text-xs text-white focus:outline-none focus:border-cyan-500"
+            >You are LYNXIEE MARKET AI, an ultra-fast, intelligent, and concise AI assistant with deep expertise in coding, data analytics, and general knowledge.</textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-semibold text-slate-300">Temperature</span>
+                <span id="tempValueLabel" class="font-mono text-cyan-400">0.7</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="2"
+                step="0.05"
+                value="0.7"
+                id="tempRangeInput"
+                oninput="document.getElementById('tempValueLabel').innerText = this.value"
+                class="w-full accent-cyan-500 cursor-pointer"
+              />
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-semibold text-slate-300">Max Tokens</span>
+                <span id="maxTokensValueLabel" class="font-mono text-cyan-400">2048</span>
+              </div>
+              <input
+                type="range"
+                min="256"
+                max="8192"
+                step="256"
+                value="2048"
+                id="maxTokensRangeInput"
+                oninput="document.getElementById('maxTokensValueLabel').innerText = this.value"
+                class="w-full accent-cyan-500 cursor-pointer"
+              />
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-semibold text-slate-300">Top-P</span>
+                <span id="topPValueLabel" class="font-mono text-cyan-400">0.9</span>
+              </div>
+              <input
+                type="range"
+                min="0.1"
+                max="1"
+                step="0.05"
+                value="0.9"
+                id="topPRangeInput"
+                oninput="document.getElementById('topPValueLabel').innerText = this.value"
+                class="w-full accent-cyan-500 cursor-pointer"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------- -->
+        <!-- TAB 7: LOGS                                          -->
+        <!-- ---------------------------------------------------- -->
+        <section id="tab-logs" class="tab-content hidden space-y-4 max-w-6xl mx-auto">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white">Diagnostic & API Logs</h3>
+            <button
+              onclick="clearDiagnosticLogs()"
+              class="py-1.5 px-3 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 text-xs font-medium border border-rose-500/30 flex items-center gap-1.5"
+            >
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Bersihkan Log</span>
+            </button>
+          </div>
+
+          <div class="rounded-2xl bg-[#0f172a] border border-slate-800 overflow-hidden">
+            <div id="diagnosticLogsList" class="divide-y divide-slate-800">
+              <div class="p-6 text-center text-xs text-slate-500">Memuat log sistem...</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---------------------------------------------------- -->
+        <!-- TAB 8: SECURITY & DEV MODE                           -->
+        <!-- ---------------------------------------------------- -->
+        <section id="tab-security" class="tab-content hidden space-y-6 max-w-4xl mx-auto">
+          <div class="p-5 rounded-2xl bg-[#0f172a] border border-slate-800 space-y-4">
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+              <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+              <div>
+                <h3 class="text-sm font-bold text-white">Developer Security Status</h3>
+                <p class="text-xs text-slate-400">Status autentikasi akun dev@lynxie.ai</p>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-[#080c14] border border-slate-800 space-y-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Akun Developer:</span>
+                <span class="font-mono text-emerald-400 font-bold">dev@lynxie.ai</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-400">Passwordless Bypass:</span>
+                <span class="text-emerald-400 font-semibold">Aktif (Otomatis)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ---------------------------------------------------- -->
+  <!-- JAVASCRIPT LOGIC & 3-SYSTEM ORCHESTRATION            -->
+  <!-- ---------------------------------------------------- -->
+  <script>
+    // State Store
+    let currentProviderConfig = {
+      activeProvider: 'mayzaa',
+      activeModel: 'openai/gpt-4o-mini',
+      openRouterKey: '',
+      openRouterKeyMasked: '',
+      openRouterKeyPresent: false,
+      xkiroKey: '',
+      xkiroKeyMasked: '',
+      xkiroKeyPresent: false,
+      xkiroBaseUrl: 'https://api.xkiro.com/v1',
+      xkiroModel: 'openai/gpt-4o-mini',
+      mayzaaUrl: 'https://api.mayzaa.my.id/api/ai/chat-gpt?text=',
+    };
+
+    let allModels = [];
+    let currentModelFilter = 'ALL';
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      checkAuthStatus();
+    });
+
+    // Check Auth Status & Auto-Bypass for dev account
+    async function checkAuthStatus() {
+      try {
+        const autoRes = await fetch('/api/admin/auto-auth');
+        const autoData = await autoRes.json();
+        if (autoData.authenticated) {
+          grantAccess();
+          return;
+        }
+
+        const res = await fetch('/api/admin/status');
+        const data = await res.json();
+        if (data.authenticated) {
+          grantAccess();
+        } else {
+          document.getElementById('authScreen').classList.remove('hidden');
+          document.getElementById('mainDashboard').classList.add('hidden');
+        }
+      } catch (err) {
+        document.getElementById('authScreen').classList.remove('hidden');
+      }
+    }
+
+    function grantAccess() {
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('mainDashboard').classList.remove('hidden');
+      loadAllData();
+      lucide.createIcons();
+    }
+
+    async function handleDevBypass() {
+      const btn = document.getElementById('devBypassBtn');
+      btn.innerHTML = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin"></i><span>Memverifikasi...</span>';
+      lucide.createIcons();
+      try {
+        const res = await fetch('/api/admin/dev-login');
+        const data = await res.json();
+        if (data.authenticated) {
+          showToast('success', 'Bypass Sukses', 'Masuk sebagai developer dev@lynxie.ai');
+          grantAccess();
+        } else {
+          showToast('error', 'Gagal', 'Dev login tidak dapat diakses.');
+        }
+      } catch (e) {
+        showToast('error', 'Koneksi Gagal', 'Server backend offline.');
+      }
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmailInput').value.trim() || 'dev@lynxie.ai';
+      const password = document.getElementById('authPasswordInput').value.trim();
+
+      const btn = document.getElementById('authSubmitBtn');
+      btn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4 animate-spin"></i><span>Memverifikasi...</span>';
+      lucide.createIcons();
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast('success', 'Akses Diterima', 'Selamat datang di Panel /openr');
+          grantAccess();
+        } else {
+          const errBox = document.getElementById('authErrorBox');
+          document.getElementById('authErrorMsg').innerText = data.error || 'Password salah.';
+          errBox.classList.remove('hidden');
+        }
+      } catch (e) {
+        showToast('error', 'Error', 'Gagal menghubungi server.');
+      } finally {
+        btn.innerHTML = '<i data-lucide="lock" class="w-4 h-4"></i><span>Otorisasi & Buka Dashboard</span>';
+        lucide.createIcons();
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch('/api/admin/logout', { method: 'POST' });
+      } catch {}
+      window.location.href = '/';
+    }
+
+    function togglePasswordVisibility() {
+      const input = document.getElementById('authPasswordInput');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    // Switch Sidebar Tab
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach((el) => el.classList.add('hidden'));
+      const activeEl = document.getElementById(`tab-${tabId}`);
+      if (activeEl) activeEl.classList.remove('hidden');
+
+      document.querySelectorAll('.sidebar-btn').forEach((btn) => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`navBtn-${tabId}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const titles = {
+        providers: ['3 AI Provider Gateway Hub', 'Pusat konfigurasi OpenRouter, Mayzaa API, dan Xkiro.com'],
+        dashboard: ['System Overview & Telemetry', 'Metrik real-time performa latency dan kesehatan server'],
+        models: ['Model Catalog & Context Window', 'Katalog model AI lengkap dengan detail context'],
+        tester: ['Interactive AI Sandbox Playground', 'Uji coba live streaming respon dari 3 provider'],
+        apidocs: ['Direct GET & POST API Documentation', 'Daftar endpoint API siap pakai'],
+        config: ['AI Hyperparameters & System Prompt', 'Pengaturan temperature, max tokens, dan prompt dasar'],
+        logs: ['Real-time Diagnostic Logs', 'Riwayat log permintaan API dan status code'],
+        security: ['Security & Developer Authentication', 'Status akun developer dan akses tanpa password'],
+      };
+
+      if (titles[tabId]) {
+        document.getElementById('pageTitle').innerText = titles[tabId][0];
+        document.getElementById('pageSubtitle').innerText = titles[tabId][1];
+      }
+
+      lucide.createIcons();
+    }
+
+    // Load All Data
+    async function loadAllData() {
+      await Promise.all([
+        fetchProvidersConfig(),
+        fetchTelemetry(),
+        fetchModels(),
+        fetchLogs(),
+      ]);
+    }
+
+    async function fetchProvidersConfig() {
+      try {
+        const res = await fetch('/api/admin/providers');
+        if (res.ok) {
+          const data = await res.json();
+          currentProviderConfig = {
+            activeProvider: data.activeProvider || 'mayzaa',
+            activeModel: data.activeModel || 'openai/gpt-4o-mini',
+            openRouterKey: '',
+            openRouterKeyMasked: data.providers?.openrouter?.keyMasked || '',
+            openRouterKeyPresent: Boolean(data.providers?.openrouter?.keyPresent),
+            xkiroKey: '',
+            xkiroKeyMasked: data.providers?.xkiro?.keyMasked || '',
+            xkiroKeyPresent: Boolean(data.providers?.xkiro?.keyPresent),
+            xkiroBaseUrl: data.providers?.xkiro?.baseUrl || 'https://api.xkiro.com/v1',
+            xkiroModel: data.providers?.xkiro?.model || 'openai/gpt-4o-mini',
+            mayzaaUrl: data.providers?.mayzaa?.apiUrl || 'https://api.mayzaa.my.id/api/ai/chat-gpt?text=',
+          };
+
+          // Update UI
+          setActiveProviderUI(currentProviderConfig.activeProvider);
+
+          if (currentProviderConfig.openRouterKeyPresent) {
+            document.getElementById('openRouterKeyStatusBadge').innerText = 'Tersimpan';
+            document.getElementById('openRouterKeyStatusBadge').className = 'text-emerald-400 font-medium';
+            document.getElementById('openRouterMaskedKeyDisplay').innerText = `Tersimpan: ${currentProviderConfig.openRouterKeyMasked}`;
+          }
+
+          if (currentProviderConfig.xkiroKeyPresent) {
+            document.getElementById('xkiroMaskedKeyDisplay').innerText = `Tersimpan: ${currentProviderConfig.xkiroKeyMasked}`;
+          }
+
+          document.getElementById('openRouterModelSelect').value = currentProviderConfig.activeModel;
+          document.getElementById('mayzaaUrlInput').value = currentProviderConfig.mayzaaUrl;
+          document.getElementById('xkiroBaseUrlInput').value = currentProviderConfig.xkiroBaseUrl;
+          document.getElementById('xkiroModelInput').value = currentProviderConfig.xkiroModel;
+
+          if (data.systemPrompt) {
+            document.getElementById('systemPromptInput').value = data.systemPrompt;
+          }
+          if (data.aiSettings) {
+            document.getElementById('tempRangeInput').value = data.aiSettings.temperature || 0.7;
+            document.getElementById('tempValueLabel').innerText = data.aiSettings.temperature || 0.7;
+            document.getElementById('maxTokensRangeInput').value = data.aiSettings.maxTokens || 2048;
+            document.getElementById('maxTokensValueLabel').innerText = data.aiSettings.maxTokens || 2048;
+            document.getElementById('topPRangeInput').value = data.aiSettings.topP || 0.9;
+            document.getElementById('topPValueLabel').innerText = data.aiSettings.topP || 0.9;
+          }
+        }
+      } catch (e) {
+        console.warn('Providers config fetch error:', e);
+      }
+    }
+
+    function setActiveProviderUI(provider) {
+      document.getElementById('sidebarActiveProviderBadge').innerText = provider.toUpperCase();
+      document.getElementById('activeProviderHeaderTag').innerText = `Aktif: ${provider.toUpperCase()}`;
+
+      ['openrouter', 'mayzaa', 'xkiro'].forEach((p) => {
+        const card = document.getElementById(`card-prov-${p}`);
+        const radio = document.getElementById(`radio-${p}`);
+        if (p === provider) {
+          card.className = 'cursor-pointer p-4 rounded-xl border border-cyan-500 bg-cyan-950/25 shadow-lg shadow-cyan-500/10 transition-all flex flex-col justify-between space-y-3';
+          radio.checked = true;
+        } else {
+          card.className = 'cursor-pointer p-4 rounded-xl border border-slate-800 bg-[#131d33] hover:border-slate-700 transition-all flex flex-col justify-between space-y-3';
+          radio.checked = false;
+        }
+      });
+    }
+
+    async function setActiveProviderRadio(provider) {
+      setActiveProviderUI(provider);
+      currentProviderConfig.activeProvider = provider;
+      try {
+        const res = await fetch('/api/admin/providers/set-active', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider }),
+        });
+        if (res.ok) {
+          showToast('success', 'Provider Diubah', `Respon AI sekarang dialirkan dari ${provider.toUpperCase()}`);
+        }
+      } catch (e) {
+        showToast('error', 'Gagal', 'Tidak dapat mengubah provider aktif.');
+      }
+    }
+
+    async function saveProviderSettings() {
+      const btn = document.getElementById('saveConfigBtn');
+      btn.innerHTML = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin"></i><span>Menyimpan...</span>';
+      lucide.createIcons();
+
+      const openRouterKey = document.getElementById('openRouterKeyInput').value.trim();
+      const xkiroKey = document.getElementById('xkiroKeyInput').value.trim();
+
+      const payload = {
+        activeProvider: currentProviderConfig.activeProvider,
+        activeModel: document.getElementById('openRouterModelSelect').value,
+        openRouterKey: openRouterKey || undefined,
+        xkiroKey: xkiroKey || undefined,
+        xkiroBaseUrl: document.getElementById('xkiroBaseUrlInput').value.trim(),
+        xkiroModel: document.getElementById('xkiroModelInput').value.trim(),
+        mayzaaUrl: document.getElementById('mayzaaUrlInput').value.trim(),
+        systemPrompt: document.getElementById('systemPromptInput').value.trim(),
+        temperature: parseFloat(document.getElementById('tempRangeInput').value),
+        maxTokens: parseInt(document.getElementById('maxTokensRangeInput').value),
+        topP: parseFloat(document.getElementById('topPRangeInput').value),
+      };
+
+      try {
+        const res = await fetch('/api/admin/providers/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          showToast('success', 'Konfigurasi Disimpan', '3 Sistem Provider berhasil diperbarui.');
+          fetchProvidersConfig();
+        } else {
+          showToast('error', 'Gagal', 'Server menolak pembaruan.');
+        }
+      } catch (e) {
+        showToast('error', 'Gagal', 'Terjadi kesalahan koneksi.');
+      } finally {
+        btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Simpan Perubahan</span>';
+        lucide.createIcons();
+      }
+    }
+
+    async function testProviderConnection(provider) {
+      const btn = document.getElementById(provider === 'openrouter' ? 'testOpenRouterBtn' : provider === 'mayzaa' ? 'testMayzaaBtn' : 'testXkiroBtn');
+      btn.innerHTML = '<i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin"></i><span>Menguji...</span>';
+      lucide.createIcons();
+
+      let endpoint = '/api/admin/providers/test-openrouter';
+      let payload = { apiKey: document.getElementById('openRouterKeyInput').value.trim() };
+
+      if (provider === 'mayzaa') {
+        endpoint = '/api/admin/providers/test-mayzaa';
+        payload = { apiUrl: document.getElementById('mayzaaUrlInput').value.trim() };
+      } else if (provider === 'xkiro') {
+        endpoint = '/api/admin/providers/test-xkiro';
+        payload = {
+          apiKey: document.getElementById('xkiroKeyInput').value.trim(),
+          baseUrl: document.getElementById('xkiroBaseUrlInput').value.trim(),
+        };
+      }
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        const resBox = document.getElementById(`testResult-${provider}`);
+        resBox.classList.remove('hidden');
+        if (data.success) {
+          resBox.className = 'p-3 rounded-xl text-xs bg-emerald-950/40 border border-emerald-500/30 text-emerald-300';
+          resBox.innerText = `✅ ${data.message || 'Koneksi Berhasil!'}`;
+        } else {
+          resBox.className = 'p-3 rounded-xl text-xs bg-rose-950/40 border border-rose-500/30 text-rose-300';
+          resBox.innerText = `❌ ${data.message || 'Koneksi Gagal.'}`;
+        }
+      } catch (e) {
+        showToast('error', 'Error', 'Gagal melakukan tes ping.');
+      } finally {
+        btn.innerHTML = '<i data-lucide="zap" class="w-3.5 h-3.5"></i><span>Test Koneksi</span>';
+        lucide.createIcons();
+      }
+    }
+
+    async function fetchTelemetry() {
+      try {
+        const res = await fetch('/api/admin/telemetry');
+        if (res.ok) {
+          const t = await res.json();
+          document.getElementById('metricHealth').innerText = t.health;
+          document.getElementById('metricLatency').innerText = `${t.latency} ms`;
+          document.getElementById('metricTokens').innerText = t.tokens.total.toLocaleString();
+          document.getElementById('metricRequests').innerText = t.sessions.totalRequests;
+        }
+      } catch {}
+    }
+
+    async function fetchModels() {
+      try {
+        const res = await fetch('/api/admin/models');
+        if (res.ok) {
+          const data = await res.json();
+          allModels = data.models || [];
+          document.getElementById('modelsSidebarCount').innerText = `${allModels.length}+`;
+          renderModelsList();
+        }
+      } catch {}
+    }
+
+    function filterModels(provider) {
+      currentModelFilter = provider;
+      document.querySelectorAll('.model-filter-btn').forEach((b) => {
+        b.className = b.innerText === provider || (provider === 'ALL' && b.innerText === 'Semua')
+          ? 'model-filter-btn active px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-600 text-white'
+          : 'model-filter-btn px-3 py-1.5 rounded-lg text-xs bg-[#0f172a] border border-slate-800 text-slate-400 hover:text-white';
+      });
+      renderModelsList();
+    }
+
+    function renderModelsList() {
+      const container = document.getElementById('modelsGridContainer');
+      const search = document.getElementById('modelSearchInput').value.toLowerCase().trim();
+
+      let filtered = allModels;
+      if (currentModelFilter !== 'ALL') {
+        filtered = filtered.filter((m) => m.provider.toLowerCase() === currentModelFilter.toLowerCase());
+      }
+      if (search) {
+        filtered = filtered.filter((m) => m.name.toLowerCase().includes(search) || m.id.toLowerCase().includes(search));
+      }
+
+      container.innerHTML = filtered.map((m) => {
+        const isSelected = currentProviderConfig.activeModel === m.id;
+        return `
+          <div class="p-4 rounded-2xl border ${isSelected ? 'bg-cyan-950/20 border-cyan-500 shadow-md' : 'bg-[#0f172a] border-slate-800 hover:border-slate-700'} flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">${m.provider}</span>
+                ${isSelected ? '<span class="text-[10px] font-bold text-cyan-400">Aktif</span>' : ''}
+              </div>
+              <h4 class="text-sm font-bold text-white">${m.name}</h4>
+              <p class="text-[11px] font-mono text-slate-400 truncate mt-0.5">${m.id}</p>
+              <p class="text-xs text-slate-400 mt-2 line-clamp-2">${m.description || ''}</p>
+            </div>
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+              <span class="text-slate-400 font-mono">${((m.context_length || 128000) / 1000).toFixed(0)}k Context</span>
+              <button
+                onclick="selectModel('${m.id}', '${m.name}')"
+                class="px-3 py-1 rounded-lg text-xs font-semibold ${isSelected ? 'bg-cyan-500/20 text-cyan-300' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}"
+              >
+                ${isSelected ? 'Terpilih' : 'Gunakan Model'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectModel(modelId, modelName) {
+      currentProviderConfig.activeModel = modelId;
+      document.getElementById('openRouterModelSelect').value = modelId;
+      renderModelsList();
+      showToast('success', 'Model Dipilih', modelName);
+    }
+
+    async function sendTesterMessage() {
+      const input = document.getElementById('testerPromptInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const engine = document.getElementById('testerEngineSelect').value;
+      const list = document.getElementById('testerMessagesList');
+
+      // Append user msg
+      const userDiv = document.createElement('div');
+      userDiv.className = 'flex flex-col items-end';
+      userDiv.innerHTML = `
+        <div class="text-[10px] text-slate-400 mb-1 px-1">Tester • Sekarang</div>
+        <div class="max-w-[85%] p-3.5 rounded-2xl text-xs bg-cyan-600 text-white rounded-br-none">${text}</div>
+      `;
+      list.appendChild(userDiv);
+      input.value = '';
+
+      // Append bot loading
+      const botDiv = document.createElement('div');
+      botDiv.className = 'flex flex-col items-start';
+      botDiv.innerHTML = `
+        <div class="text-[10px] text-slate-400 mb-1 px-1">${engine.toUpperCase()} Engine</div>
+        <div class="max-w-[85%] p-3.5 rounded-2xl text-xs bg-[#141f38] text-slate-200 border border-slate-700/60 rounded-bl-none">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin inline mr-1 text-cyan-400"></i> Memproses respon...
+        </div>
+      `;
+      list.appendChild(botDiv);
+      lucide.createIcons();
+      list.scrollTop = list.scrollHeight;
+
+      let endpoint = '/api/chat';
+      let payload = { messages: [{ role: 'user', content: text }], model: currentProviderConfig.activeModel };
+
+      if (engine === 'openrouter') {
+        endpoint = '/api/openr';
+        payload = { text, model: currentProviderConfig.activeModel };
+      } else if (engine === 'xkiro') {
+        endpoint = '/api/xkiro';
+        payload = { text, model: currentProviderConfig.xkiroModel };
+      }
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        const responseText = data.result || data.response || data.text || 'No response';
+        botDiv.querySelector('div:last-child').innerText = responseText;
+      } catch (e) {
+        botDiv.querySelector('div:last-child').innerText = `Error: ${e.message}`;
+      }
+      list.scrollTop = list.scrollHeight;
+    }
+
+    async function fetchLogs() {
+      try {
+        const res = await fetch('/api/admin/logs');
+        if (res.ok) {
+          const data = await res.json();
+          const list = document.getElementById('diagnosticLogsList');
+          if (!data.logs || data.logs.length === 0) {
+            list.innerHTML = '<div class="p-6 text-center text-xs text-slate-500">Belum ada catatan log.</div>';
+            return;
+          }
+          list.innerHTML = data.logs.map((l) => `
+            <div class="p-3.5 flex items-center justify-between gap-4 text-xs">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] ${l.statusCode < 400 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">${l.statusCode}</span>
+                <span class="font-mono text-slate-400 uppercase text-[10px] px-1.5 py-0.5 rounded bg-slate-800">${l.provider}</span>
+                <span class="text-white truncate max-w-xs">${l.promptSnippet || l.endpoint}</span>
+              </div>
+              <div class="flex items-center gap-3 text-slate-400 font-mono text-[11px] shrink-0">
+                <span>${l.latencyMs}ms</span>
+                <span>${new Date(l.timestamp).toLocaleTimeString()}</span>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch {}
+    }
+
+    async function clearDiagnosticLogs() {
+      try {
+        await fetch('/api/admin/logs/clear', { method: 'POST' });
+        document.getElementById('diagnosticLogsList').innerHTML = '<div class="p-6 text-center text-xs text-slate-500">Log dibersihkan.</div>';
+        showToast('info', 'Log Dibersihkan', 'Semua riwayat diagnostik telah dihapus.');
+      } catch {}
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text);
+      showToast('info', 'Disalin', text);
+    }
+
+    function showToast(type, title, message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200' : type === 'error' ? 'bg-rose-950/90 border-rose-500/40 text-rose-200' : 'bg-slate-900/90 border-cyan-500/40 text-cyan-200';
+      toast.className = `p-3.5 rounded-2xl border ${bg} shadow-2xl backdrop-blur-md pointer-events-auto transition-all text-xs`;
+      toast.innerHTML = `<p class="font-bold">${title}</p><p class="text-slate-300 mt-0.5">${message}</p>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+  </script>
+</body>
+</html>

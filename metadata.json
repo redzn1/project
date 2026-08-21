@@ -1,0 +1,6 @@
+{
+  "name": "LYNXIEE MARKET AI",
+  "description": "Platform AI Chatbot modern LYNXIEE MARKET dengan integrasi 3 Sistem AI Provider (OpenRouter, Mayzaa API, dan Xkiro.com), Dashboard /openr dengan navigasi navbar samping kiri dan akses developer passwordless.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

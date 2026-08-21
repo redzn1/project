@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenRouter Control Panel & GET API — LYNXIEE MARKET AI</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="apple-touch-icon" href="/logo.svg" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              dark: '#005c4b',
+            },
+            cyber: {
+              bg: '#090d16',
+              surface: '#0f172a',
+              card: '#131e36',
+              border: '#1e293b',
+              accent: '#38bdf8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #080c14;
+      color: #f1f5f9;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(56, 189, 248, 0.12);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+      box-shadow: 0 10px 30px -10px rgba(56, 189, 248, 0.15);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-[#090d16]/90 backdrop-blur-md px-4 sm:px-8 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-cyan-500/20 flex items-center justify-center">
+        <img src="/logo.svg" alt="LYNXIEE Logo" class="w-full h-full object-contain" />
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
+            LYNXIEE MARKET
+            <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 font-mono border border-cyan-500/30">/openr</span>
+          </h1>
+        </div>
+        <p class="text-xs text-slate-400 hidden sm:block">OpenRouter Model Manager & Direct GET API Hub</p>
+      </div>
+    </div>
+
+    <!-- Right Header Actions -->
+    <div class="flex items-center gap-2.5">
+      <!-- Status Badge -->
+      <div id="headerStatusBadge" class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="headerStatusText">Memeriksa...</span>
+      </div>
+
+      <!-- Quick Nav Links -->
+      <a href="/" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 bg-slate-800/60 hover:bg-slate-700/80 hover:text-white transition-colors border border-slate-700/40">
+        <i data-lucide="message-square" class="w-3.5 h-3.5 text-emerald-400"></i>
+        <span>Chatbot</span>
+      </a>
+
+      <button onclick="switchTab('api-guide')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 transition-colors border border-cyan-500/30">
+        <i data-lucide="code-2" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">GET API Docs</span>
+      </button>
+
+      <!-- Logout Button (Shown when logged in) -->
+      <button id="headerLogoutBtn" onclick="handleLogout()" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-rose-300 bg-rose-950/40 hover:bg-rose-900/60 hover:text-white transition-colors border border-rose-500/30">
+        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ------------------------------------------ -->
+  <!-- AUTHENTICATION GATE (PASSWORD FROM .env) -->
+  <!-- ------------------------------------------ -->
+  <section id="authGateSection" class="flex-1 flex items-center justify-center p-4 sm:p-6 my-auto">
+    <div class="glass-card max-w-md w-full p-6 sm:p-8 rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/50 space-y-6 animate-in fade-in zoom-in-95 duration-300">
+      
+      <!-- Gate Header -->
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 mx-auto rounded-2xl overflow-hidden shadow-lg shadow-cyan-500/30 flex items-center justify-center">
+          <img src="/logo.svg" alt="LYNXIEE Logo" class="w-full h-full object-contain" />
+        </div>
+        <h2 class="text-xl font-bold text-white tracking-tight">OpenRouter Admin Gate</h2>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Halaman ini dilindungi. Masukkan password yang di-set pada file <span class="font-mono text-cyan-300 bg-cyan-950/50 px-1.5 py-0.5 rounded border border-cyan-500/30">.env</span> (<code class="text-emerald-300">ADMIN_PASSWORD</code>).
+        </p>
+      </div>
+
+      <!-- Error Alert -->
+      <div id="authGateError" class="hidden p-3.5 rounded-xl bg-rose-950/60 border border-rose-500/40 text-xs text-rose-200 flex items-center gap-2">
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400 shrink-0"></i>
+        <span id="authGateErrorText">Password salah. Silakan coba lagi.</span>
+      </div>
+
+      <!-- Password Form -->
+      <form id="authGateForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider font-mono">Master Password (.env)</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input
+              type="password"
+              id="authPasswordInput"
+              placeholder="Masukkan password admin..."
+              required
+              autocomplete="current-password"
+              class="w-full bg-[#080c14] border border-slate-700 rounded-xl pl-10 pr-10 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-mono"
+            />
+            <button
+              type="button"
+              onclick="togglePasswordVisibility('authPasswordInput', 'authEyeIcon')"
+              class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+            >
+              <i data-lucide="eye" id="authEyeIcon" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          id="authSubmitBtn"
+          class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-cyan-500 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/25 transition-all flex items-center justify-center gap-2"
+        >
+          <i data-lucide="key" class="w-4 h-4 text-slate-950"></i>
+          <span>Buka Control Panel /openr</span>
+        </button>
+      </form>
+
+      <!-- Security Notice -->
+      <div class="pt-3 border-t border-slate-800/80 text-center space-y-1.5">
+        <p class="text-[11px] text-slate-500 font-mono">
+          Route ini tidak ditampilkan ke user biasa dan hanya dapat diakses melalui URL langsung <span class="text-cyan-400">/openr</span>.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <main id="mainAppSection" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    
+    <!-- Tab Navigation -->
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div class="flex items-center gap-1.5 sm:gap-2 p-1 bg-slate-900/90 rounded-xl border border-slate-800 text-xs sm:text-sm font-medium">
+        <button id="tabBtn-dashboard" onclick="switchTab('dashboard')" class="tab-btn active flex items-center gap-2 px-3.5 py-2 rounded-lg bg-cyan-500 text-slate-950 font-semibold shadow-md transition-all">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard & GET Tester</span>
+        </button>
+        <button id="tabBtn-models" onclick="switchTab('models')" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all">
+          <i data-lucide="layers" class="w-4 h-4 text-cyan-400"></i>
+          <span>Model Management (<span id="modelsCountBadge">0</span>)</span>
+        </button>
+        <button id="tabBtn-config" onclick="switchTab('config')" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all">
+          <i data-lucide="key" class="w-4 h-4 text-amber-400"></i>
+          <span>API Key & Settings</span>
+        </button>
+        <button id="tabBtn-api-guide" onclick="switchTab('api-guide')" class="tab-btn flex items-center gap-2 px-3.5 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all">
+          <i data-lucide="terminal" class="w-4 h-4 text-purple-400"></i>
+          <span>Endpoint Docs</span>
+        </button>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button onclick="openAddModal()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-cyan-500/20 transition-all">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>Tambah Model Baru</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------ -->
+    <!-- TAB 1: DASHBOARD & INTERACTIVE GET TESTER -->
+    <!-- ------------------------------------------ -->
+    <section id="tab-dashboard" class="space-y-6">
+      
+      <!-- Top Overview Stats -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
+        <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800">
+          <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span>Model Aktif</span>
+            <i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i>
+          </div>
+          <div id="statActiveModel" class="text-sm sm:text-base font-bold text-white font-mono truncate">Memuat...</div>
+          <div class="text-[11px] text-cyan-400 mt-1 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            Siap merespon permintaan
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800">
+          <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span>Status OpenRouter</span>
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+          </div>
+          <div id="statKeyStatus" class="text-sm sm:text-base font-bold text-white flex items-center gap-1.5">
+            <span id="statKeyDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span id="statKeyLabel">Terhubung</span>
+          </div>
+          <div id="statKeyMasked" class="text-[11px] text-slate-400 mt-1 font-mono">sk-or-v1-••••••</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800">
+          <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span>Jumlah Model</span>
+            <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
+          </div>
+          <div id="statTotalModels" class="text-2xl font-bold text-white">0</div>
+          <div class="text-[11px] text-indigo-400 mt-1">Tersedia untuk dipilih</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-4 sm:p-5 border border-slate-800">
+          <div class="flex items-center justify-between text-slate-400 text-xs mb-2">
+            <span>GET API Endpoint</span>
+            <i data-lucide="globe" class="w-4 h-4 text-purple-400"></i>
+          </div>
+          <div class="text-xs sm:text-sm font-bold text-purple-300 font-mono">/api/openr?text=...</div>
+          <div class="text-[11px] text-slate-400 mt-1">Format teks langsung (text/plain)</div>
+        </div>
+      </div>
+
+      <!-- Live Interactive GET API Tester -->
+      <div class="glass-card rounded-2xl p-5 sm:p-6 border border-slate-800 shadow-2xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="play-circle" class="w-5 h-5 text-cyan-400"></i>
+              Live GET Request Playground & URL Builder
+            </h2>
+            <p class="text-xs text-slate-400">Uji coba langsung permintaan AI via HTTP GET endpoint dengan model pilihan Anda.</p>
+          </div>
+
+          <!-- Format Toggle -->
+          <div class="flex items-center gap-2 bg-slate-900/80 p-1 rounded-lg border border-slate-800 text-xs font-mono">
+            <span class="text-slate-400 px-1.5">Output:</span>
+            <button id="formatTextBtn" onclick="setOutputFormat('text')" class="px-2 py-1 rounded bg-cyan-500/20 text-cyan-300 font-semibold border border-cyan-500/30">Teks Murni</button>
+            <button id="formatJsonBtn" onclick="setOutputFormat('json')" class="px-2 py-1 rounded text-slate-400 hover:text-white">JSON</button>
+          </div>
+        </div>
+
+        <!-- Controls: Input text & Model Selector -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div class="md:col-span-2 space-y-1.5">
+            <label class="block text-xs font-medium text-slate-300">Prompt / Pertanyaan (Parameter ?text=)</label>
+            <div class="relative">
+              <input
+                type="text"
+                id="testerPromptInput"
+                value="Jelaskan apa itu AI secara singkat dan padat"
+                placeholder="Ketik pertanyaan atau prompt..."
+                class="w-full bg-[#0b0f19] border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-sans"
+                oninput="updateGeneratedUrl()"
+                onkeydown="if(event.key==='Enter') runGetTest()"
+              />
+              <button onclick="runGetTest()" id="testerSubmitBtn" class="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs flex items-center gap-1.5 transition-all shadow-md">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                <span>Kirim GET</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-medium text-slate-300">Pilih Model (Parameter ?model=)</label>
+            <select
+              id="testerModelSelect"
+              class="w-full bg-[#0b0f19] border border-slate-700/80 rounded-xl px-3 py-2.5 text-xs sm:text-sm text-cyan-300 focus:outline-none focus:border-cyan-500 font-mono"
+              onchange="updateGeneratedUrl()"
+            >
+              <option value="">(Default Active Model)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Generated URL Display Box -->
+        <div class="space-y-1.5 mb-5">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              Live Generated GET Endpoint URL:
+            </span>
+            <div class="flex items-center gap-2">
+              <button onclick="copyGeneratedUrl()" class="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 text-[11px]">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+                <span id="copyUrlText">Salin URL</span>
+              </button>
+              <button onclick="openGeneratedUrlInNewTab()" class="text-slate-400 hover:text-white flex items-center gap-1 text-[11px]">
+                <i data-lucide="external-link" class="w-3 h-3"></i>
+                <span>Buka di Tab Baru</span>
+              </button>
+            </div>
+          </div>
+          <div class="p-3 bg-[#080c14] border border-slate-800 rounded-xl font-mono text-xs text-emerald-300 break-all select-all flex items-center justify-between gap-2" id="generatedUrlBox">
+            /api/openr?text=Jelaskan%20apa%20itu%20AI
+          </div>
+        </div>
+
+        <!-- Live Response Output Window -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span class="flex items-center gap-1.5 font-medium text-slate-300">
+              <i data-lucide="terminal" class="w-3.5 h-3.5 text-cyan-400"></i>
+              Respon Endpoint:
+            </span>
+            <div class="flex items-center gap-3 text-[11px] font-mono">
+              <span id="responseStatus" class="text-slate-400">Status: Standby</span>
+              <span id="responseLatency" class="text-slate-400">Latency: 0ms</span>
+              <button onclick="copyResponseText()" class="text-cyan-400 hover:text-cyan-300 flex items-center gap-1">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+                <span>Salin Jawaban</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="responseOutputBox" class="min-h-[140px] max-h-[380px] p-4 bg-[#080c14] border border-slate-800 rounded-xl text-slate-200 text-sm leading-relaxed overflow-y-auto custom-scrollbar font-mono whitespace-pre-wrap">
+Silakan klik tombol "Kirim GET" di atas untuk menguji respon dari endpoint API OpenRouter.
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ------------------------------------------ -->
+    <!-- TAB 2: MODEL MANAGEMENT (CRUD) -->
+    <!-- ------------------------------------------ -->
+    <section id="tab-models" class="space-y-6 hidden">
+      
+      <!-- Toolbar: Search, Filter, Sync, Add -->
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 glass-card p-4 rounded-2xl border border-slate-800">
+        <div class="flex-1 flex items-center gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input
+              type="text"
+              id="modelSearchInput"
+              placeholder="Cari model (misal: claude, gpt-4o, deepseek, qwen, llama)..."
+              class="w-full bg-[#080c14] border border-slate-700/80 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+              oninput="renderModelsList()"
+            />
+          </div>
+          <select
+            id="modelProviderFilter"
+            class="bg-[#080c14] border border-slate-700/80 rounded-xl px-3 py-2 text-xs sm:text-sm text-slate-300 focus:outline-none focus:border-cyan-500"
+            onchange="renderModelsList()"
+          >
+            <option value="all">Semua Provider</option>
+            <option value="openai">OpenAI</option>
+            <option value="anthropic">Anthropic</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="google">Google</option>
+            <option value="meta">Meta Llama</option>
+            <option value="qwen">Qwen / Alibaba</option>
+            <option value="mistralai">Mistral</option>
+            <option value="custom">Custom Added</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="openSyncCatalogueModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700/60 transition-colors">
+            <i data-lucide="globe-2" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span>Browse Katalog OpenRouter</span>
+          </button>
+          <button onclick="resetModelsToDefault()" class="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-slate-800/40 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 text-xs font-medium border border-slate-800 transition-colors" title="Kembalikan model bawaan">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Models Cards Grid -->
+      <div id="modelsGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Rendered by JS -->
+      </div>
+
+    </section>
+
+    <!-- ------------------------------------------ -->
+    <!-- TAB 3: OPENROUTER API KEY & SETTINGS -->
+    <!-- ------------------------------------------ -->
+    <section id="tab-config" class="space-y-6 hidden">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left: OpenRouter Credentials & Model Selection -->
+        <div class="lg:col-span-2 glass-card rounded-2xl p-5 sm:p-6 border border-slate-800 space-y-5">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="key" class="w-5 h-5 text-amber-400"></i>
+              OpenRouter API Key & Provider Utama
+            </h2>
+            <p class="text-xs text-slate-400">Konfigurasikan API key OpenRouter Anda untuk mengakses ratusan model AI terkemuka.</p>
+          </div>
+
+          <!-- Key Input -->
+          <div class="space-y-2">
+            <label class="block text-xs font-medium text-slate-300">OpenRouter API Key (sk-or-v1-...)</label>
+            <div class="flex items-center gap-2">
+              <div class="relative flex-1">
+                <input
+                  type="password"
+                  id="openRouterKeyInput"
+                  placeholder="sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxx"
+                  class="w-full bg-[#080c14] border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 font-mono"
+                />
+                <button
+                  type="button"
+                  onclick="toggleKeyVisibility()"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <i data-lucide="eye" id="keyEyeIcon" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <button
+                onclick="testKeyConnection()"
+                id="testKeyBtn"
+                class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 flex items-center gap-1.5 transition-colors"
+              >
+                <i data-lucide="activity" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Test Koneksi</span>
+              </button>
+            </div>
+            <div id="keyStatusFeedback" class="text-xs font-mono"></div>
+          </div>
+
+          <!-- Active Model Default -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-medium text-slate-300">Model Default Utama</label>
+            <select
+              id="configActiveModelSelect"
+              class="w-full bg-[#080c14] border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-cyan-300 focus:outline-none focus:border-cyan-500 font-mono"
+            >
+              <!-- Filled by JS -->
+            </select>
+            <p class="text-[11px] text-slate-500">Model ini yang akan digunakan jika parameter <code>?model=</code> tidak disertakan.</p>
+          </div>
+
+          <!-- Hyperparameters -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-800">
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-300">Temperature</span>
+                <span id="tempValueLabel" class="font-mono text-cyan-400">0.7</span>
+              </div>
+              <input
+                type="range"
+                id="tempRangeInput"
+                min="0"
+                max="2"
+                step="0.05"
+                value="0.7"
+                class="w-full accent-cyan-500 bg-slate-800 rounded-lg cursor-pointer"
+                oninput="document.getElementById('tempValueLabel').innerText = this.value"
+              />
+              <p class="text-[10px] text-slate-500">Kreativitas jawaban AI</p>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-300">Max Tokens</span>
+                <span id="maxTokensValueLabel" class="font-mono text-cyan-400">2048</span>
+              </div>
+              <input
+                type="number"
+                id="maxTokensInput"
+                min="128"
+                max="32000"
+                step="128"
+                value="2048"
+                class="w-full bg-[#080c14] border border-slate-700/80 rounded-lg px-2.5 py-1 text-xs text-white font-mono"
+                oninput="document.getElementById('maxTokensValueLabel').innerText = this.value"
+              />
+              <p class="text-[10px] text-slate-500">Batas panjang karakter respon</p>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-300">Top-P</span>
+                <span id="topPValueLabel" class="font-mono text-cyan-400">0.9</span>
+              </div>
+              <input
+                type="range"
+                id="topPRangeInput"
+                min="0.1"
+                max="1.0"
+                step="0.05"
+                value="0.9"
+                class="w-full accent-cyan-500 bg-slate-800 rounded-lg cursor-pointer"
+                oninput="document.getElementById('topPValueLabel').innerText = this.value"
+              />
+              <p class="text-[10px] text-slate-500">Nucleus sampling filtering</p>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <div class="pt-3 border-t border-slate-800 flex items-center justify-end gap-3">
+            <button
+              onclick="saveOpenRouterConfig()"
+              id="saveConfigBtn"
+              class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-cyan-500/20 flex items-center gap-2 transition-all"
+            >
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Simpan Konfigurasi</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: System Prompt Editor -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 border border-slate-800 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="scroll-text" class="w-4 h-4 text-purple-400"></i>
+              System Prompt AI
+            </h2>
+            <button onclick="resetSystemPrompt()" class="text-xs text-slate-400 hover:text-cyan-300 flex items-center gap-1 font-mono">
+              <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+
+          <textarea
+            id="systemPromptTextarea"
+            rows="10"
+            class="w-full bg-[#080c14] border border-slate-700/80 rounded-xl p-3.5 text-xs text-slate-200 font-mono leading-relaxed focus:outline-none focus:border-cyan-500 custom-scrollbar"
+            placeholder="Instruksi kepribadian dan aturan sistem AI..."
+          ></textarea>
+
+          <div class="space-y-1.5">
+            <span class="text-[11px] text-slate-400 font-medium">Template Prompt Cepat:</span>
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="applyPresetPrompt('assistant')" class="px-2 py-1 rounded bg-slate-800 text-[11px] text-slate-300 hover:text-white">LYNXIEE Default</button>
+              <button onclick="applyPresetPrompt('coder')" class="px-2 py-1 rounded bg-slate-800 text-[11px] text-slate-300 hover:text-white">Full-Stack Coder</button>
+              <button onclick="applyPresetPrompt('academic')" class="px-2 py-1 rounded bg-slate-800 text-[11px] text-slate-300 hover:text-white">Tutor Akademik</button>
+              <button onclick="applyPresetPrompt('concise')" class="px-2 py-1 rounded bg-slate-800 text-[11px] text-slate-300 hover:text-white">Singkat & To The Point</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ------------------------------------------ -->
+    <!-- TAB 4: API ENDPOINT DOCS & CODE EXAMPLES -->
+    <!-- ------------------------------------------ -->
+    <section id="tab-api-guide" class="space-y-6 hidden">
+      
+      <div class="glass-card rounded-2xl p-5 sm:p-6 border border-slate-800 space-y-6">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="book-open" class="w-5 h-5 text-cyan-400"></i>
+            Dokumentasi API Endpoint GET
+          </h2>
+          <p class="text-xs text-slate-400">Gunakan API endpoint publik ini untuk mengintegrasikan bot LYNXIEE MARKET AI ke aplikasi lain, bot WhatsApp, Telegram, cURL, atau script frontend.</p>
+        </div>
+
+        <!-- Table of Endpoints -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border border-slate-800 rounded-xl overflow-hidden font-mono">
+            <thead class="bg-[#080c14] text-slate-300 border-b border-slate-800">
+              <tr>
+                <th class="p-3">Method</th>
+                <th class="p-3">Endpoint Path</th>
+                <th class="p-3">Parameters</th>
+                <th class="p-3">Format Output</th>
+                <th class="p-3">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-slate-200">
+              <tr class="hover:bg-slate-800/30">
+                <td class="p-3 text-emerald-400 font-bold">GET</td>
+                <td class="p-3 text-cyan-300">/api/openr</td>
+                <td class="p-3 text-slate-400">?text=Halo&model=openai/gpt-4o-mini</td>
+                <td class="p-3 text-slate-300">text/plain (teks langsung)</td>
+                <td class="p-3 text-slate-400">Endpoint OpenRouter langsung dengan model kustom</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="p-3 text-emerald-400 font-bold">GET</td>
+                <td class="p-3 text-cyan-300">/api/openrouter</td>
+                <td class="p-3 text-slate-400">?text=Halo&json=true</td>
+                <td class="p-3 text-purple-300">application/json</td>
+                <td class="p-3 text-slate-400">Alias OpenRouter dengan opsi format JSON</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="p-3 text-emerald-400 font-bold">GET</td>
+                <td class="p-3 text-cyan-300">/api/ai/chat-gpt</td>
+                <td class="p-3 text-slate-400">?text=Halo</td>
+                <td class="p-3 text-slate-300">text/plain</td>
+                <td class="p-3 text-slate-400">Endpoint Mayzaa ChatGPT API</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="p-3 text-blue-400 font-bold">POST</td>
+                <td class="p-3 text-cyan-300">/api/chat</td>
+                <td class="p-3 text-slate-400">{ messages: [...] }</td>
+                <td class="p-3 text-cyan-300">Server-Sent Events (Stream)</td>
+                <td class="p-3 text-slate-400">Chatbot Streaming UI Endpoint</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Code Snippets in Multiple Languages -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-200">Contoh Implementasi Kode:</span>
+            <div class="flex items-center gap-1.5 text-xs font-mono">
+              <button onclick="showCodeSnippet('curl')" class="snippet-tab-btn active px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">cURL</button>
+              <button onclick="showCodeSnippet('js')" class="snippet-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white">JavaScript (Node/Fetch)</button>
+              <button onclick="showCodeSnippet('python')" class="snippet-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white">Python</button>
+              <button onclick="showCodeSnippet('php')" class="snippet-tab-btn px-2.5 py-1 rounded text-slate-400 hover:text-white">PHP</button>
+            </div>
+          </div>
+
+          <div class="relative">
+            <pre id="codeSnippetBox" class="p-4 bg-[#080c14] border border-slate-800 rounded-xl text-xs text-slate-300 font-mono overflow-x-auto leading-relaxed"></pre>
+            <button onclick="copyCurrentCodeSnippet()" class="absolute right-3 top-3 p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span id="copySnippetText">Salin Kode</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ------------------------------------------ -->
+  <!-- MODAL 1: TAMBAH MODEL BARU -->
+  <!-- ------------------------------------------ -->
+  <div id="addModelModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-[#0f172a] border border-slate-700/80 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-cyan-400"></i>
+          Tambah Model OpenRouter Baru
+        </h3>
+        <button onclick="closeAddModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Quick Presets -->
+      <div class="space-y-1.5">
+        <span class="text-xs text-slate-400 font-medium">Pilih Template Model Populer:</span>
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="fillAddPreset('anthropic/claude-3.5-sonnet', 'Claude 3.5 Sonnet', 'Anthropic', 'Superior reasoning, coding, and creative analysis.', 200000)" class="px-2 py-1 rounded bg-slate-800 text-[11px] text-cyan-300 hover:bg-slate-700 font-mono">+ Claude 3.5</button>
+          <button onclick="fillAddPreset('openai/gpt-4o', 'GPT-4o', 'OpenAI', 'Flagship versatile multimodal intelligence model.', 128000)" class="px-2 py-1 rounded bg-slate-800 text-[11px] text-cyan-300 hover:bg-slate-700 font-mono">+ GPT-4o</button>
+          <button onclick="fillAddPreset('deepseek/deepseek-r1', 'DeepSeek R1', 'DeepSeek', 'Advanced chain-of-thought mathematical and coding logic.', 64000)" class="px-2 py-1 rounded bg-slate-800 text-[11px] text-cyan-300 hover:bg-slate-700 font-mono">+ DeepSeek R1</button>
+          <button onclick="fillAddPreset('qwen/qwen-2.5-72b-instruct', 'Qwen 2.5 72B', 'Qwen', 'Multilingual open reasoning power.', 128000)" class="px-2 py-1 rounded bg-slate-800 text-[11px] text-cyan-300 hover:bg-slate-700 font-mono">+ Qwen 2.5</button>
+        </div>
+      </div>
+
+      <form id="addModelForm" onsubmit="handleAddModelSubmit(event)" class="space-y-3.5">
+        <div class="space-y-1">
+          <label class="text-xs text-slate-300 font-medium">Model ID OpenRouter (Wajib) *</label>
+          <input
+            type="text"
+            id="addModelId"
+            required
+            placeholder="contoh: anthropic/claude-3.5-sonnet atau deepseek/deepseek-chat"
+            class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white font-mono placeholder-slate-600 focus:outline-none focus:border-cyan-500"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-xs text-slate-300 font-medium">Nama Tampilan</label>
+            <input
+              type="text"
+              id="addModelName"
+              placeholder="Claude 3.5 Sonnet"
+              class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+          <div class="space-y-1">
+            <label class="text-xs text-slate-300 font-medium">Provider</label>
+            <input
+              type="text"
+              id="addModelProvider"
+              placeholder="Anthropic / OpenAI / Custom"
+              class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-xs text-slate-300 font-medium">Context Length (Tokens)</label>
+            <input
+              type="number"
+              id="addModelContext"
+              value="128000"
+              class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white font-mono focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+          <div class="space-y-1">
+            <label class="text-xs text-slate-300 font-medium">Perkiraan Biaya / Tag</label>
+            <input
+              type="text"
+              id="addModelPricing"
+              placeholder="Standard / Free / Economy"
+              class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-xs text-slate-300 font-medium">Deskripsi Singkat</label>
+          <textarea
+            id="addModelDescription"
+            rows="2"
+            placeholder="Deskripsi keunggulan model..."
+            class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"
+          ></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5">
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-cyan-500/20">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Simpan Model</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ------------------------------------------ -->
+  <!-- MODAL 2: EDIT MODEL -->
+  <!-- ------------------------------------------ -->
+  <div id="editModelModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-[#0f172a] border border-slate-700/80 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="edit" class="w-5 h-5 text-indigo-400"></i>
+          Edit Model OpenRouter
+        </h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="editModelForm" onsubmit="handleEditModelSubmit(event)" class="space-y-3.5">
+        <input type="hidden" id="editOriginalId" />
+
+        <div class="space-y-1">
+          <label class="text-xs text-slate-300 font-medium">Model ID</label>
+          <input
+            type="text"
+            id="editModelId"
+            required
+            class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white font-mono focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-xs text-slate-300 font-medium">Nama Tampilan</label>
+            <input
+              type="text"
+              id="editModelName"
+              required
+              class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+          <div class="space-y-1">
+            <label class="text-xs text-slate-300 font-medium">Provider</label>
+            <input
+              type="text"
+              id="editModelProvider"
+              required
+              class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="text-xs text-slate-300 font-medium">Context Length (Tokens)</label>
+            <input
+              type="number"
+              id="editModelContext"
+              required
+              class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white font-mono focus:outline-none focus:border-indigo-500"
+            />
+          </div>
+          <div class="space-y-1">
+            <label class="text-xs text-slate-300 font-medium">Status Model</label>
+            <select id="editModelEnabled" class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-indigo-500">
+              <option value="true">Aktif (Enabled)</option>
+              <option value="false">Nonaktif (Disabled)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-xs text-slate-300 font-medium">Deskripsi</label>
+          <textarea
+            id="editModelDescription"
+            rows="2"
+            class="w-full bg-[#080c14] border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+          ></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5">
+          <button type="button" onclick="closeEditModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">Batal</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-indigo-600/20">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Simpan Perubahan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ------------------------------------------ -->
+  <!-- MODAL 3: BROWSE OPENROUTER LIVE CATALOGUE -->
+  <!-- ------------------------------------------ -->
+  <div id="syncCatalogueModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-3xl w-full p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="globe-2" class="w-5 h-5 text-cyan-400"></i>
+            Katalog Model Resmi OpenRouter
+          </h3>
+          <p class="text-xs text-slate-400">Pilih dan tambahkan model langsung dari daftar ratusan model resmi OpenRouter AI.</p>
+        </div>
+        <button onclick="closeSyncModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Search in catalogue -->
+      <div class="flex items-center gap-2">
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input
+            type="text"
+            id="catalogueSearchInput"
+            placeholder="Cari dalam katalog (misal: claude, llama, gpt-4, mistral, deepseek)..."
+            class="w-full bg-[#080c14] border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"
+            oninput="renderCatalogueList()"
+          />
+        </div>
+        <button onclick="fetchLiveCatalogue()" class="px-3.5 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 text-xs font-medium border border-cyan-500/30 flex items-center gap-1.5">
+          <i data-lucide="refresh-cw" id="catalogueRefreshIcon" class="w-3.5 h-3.5"></i>
+          <span>Muat Ulang</span>
+        </button>
+      </div>
+
+      <!-- Catalogue List Container -->
+      <div id="catalogueItemsContainer" class="flex-1 overflow-y-auto custom-scrollbar divide-y divide-slate-800/80 border border-slate-800 rounded-xl bg-[#080c14] min-h-[300px]">
+        <div class="p-8 text-center text-slate-400 text-xs font-mono">Memuat katalog model dari OpenRouter...</div>
+      </div>
+
+      <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-800">
+        <span id="catalogueCountLabel">Ditemukan 0 model</span>
+        <button onclick="closeSyncModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-200 hover:bg-slate-700 text-xs font-medium">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- JS Logic -->
+  <script>
+    // State Store
+    let appState = {
+      isAuthenticated: false,
+      activeTab: 'dashboard',
+      models: [],
+      activeModel: 'openai/gpt-4o-mini',
+      openRouterKeyPresent: false,
+      outputFormat: 'text',
+      catalogueModels: [],
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      await checkAuthStatus();
+      updateGeneratedUrl();
+      showCodeSnippet('curl');
+    });
+
+    // Check Authentication Status
+    async function checkAuthStatus() {
+      try {
+        const res = await fetch('/api/admin/status').then(r => r.json());
+        if (res && res.authenticated) {
+          showAuthenticatedApp();
+        } else {
+          showAuthGate();
+        }
+      } catch (err) {
+        showAuthGate();
+      }
+    }
+
+    function showAuthGate() {
+      appState.isAuthenticated = false;
+      document.getElementById('authGateSection').classList.remove('hidden');
+      document.getElementById('mainAppSection').classList.add('hidden');
+      document.getElementById('headerLogoutBtn').classList.add('hidden');
+      document.getElementById('headerLogoutBtn').classList.remove('flex');
+      lucide.createIcons();
+    }
+
+    function showAuthenticatedApp() {
+      appState.isAuthenticated = true;
+      document.getElementById('authGateSection').classList.add('hidden');
+      document.getElementById('mainAppSection').classList.remove('hidden');
+      document.getElementById('headerLogoutBtn').classList.remove('hidden');
+      document.getElementById('headerLogoutBtn').classList.add('flex');
+      loadInitialData();
+      lucide.createIcons();
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const passwordInput = document.getElementById('authPasswordInput');
+      const password = passwordInput.value.trim();
+      const errorBox = document.getElementById('authGateError');
+      const errorText = document.getElementById('authGateErrorText');
+      const submitBtn = document.getElementById('authSubmitBtn');
+
+      if (!password) return;
+
+      errorBox.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin text-slate-950"></i><span>Memvalidasi...</span>';
+      lucide.createIcons();
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        }).then(r => r.json());
+
+        if (res && res.success) {
+          passwordInput.value = '';
+          showAuthenticatedApp();
+          showToast('Login berhasil! Selamat datang di OpenRouter Control Panel.', 'success');
+        } else {
+          errorText.innerText = res?.error || 'Password salah. Pastikan sesuai ADMIN_PASSWORD di .env.';
+          errorBox.classList.remove('hidden');
+          lucide.createIcons();
+        }
+      } catch (err) {
+        errorText.innerText = 'Gagal menghubungi server. Periksa koneksi backend.';
+        errorBox.classList.remove('hidden');
+        lucide.createIcons();
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="key" class="w-4 h-4 text-slate-950"></i><span>Buka Control Panel /openr</span>';
+        lucide.createIcons();
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch('/api/admin/logout', { method: 'POST' });
+        showAuthGate();
+        showToast('Anda telah logout dari control panel.', 'info');
+      } catch (err) {
+        showAuthGate();
+      }
+    }
+
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    // Switch Tab
+    function switchTab(tabId) {
+      appState.activeTab = tabId;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-cyan-500', 'text-slate-950', 'font-semibold');
+        btn.classList.add('text-slate-300');
+      });
+      const currentBtn = document.getElementById(`tabBtn-${tabId}`);
+      if (currentBtn) {
+        currentBtn.classList.add('active', 'bg-cyan-500', 'text-slate-950', 'font-semibold');
+        currentBtn.classList.remove('text-slate-300');
+      }
+
+      ['dashboard', 'models', 'config', 'api-guide'].forEach(t => {
+        const sec = document.getElementById(`tab-${t}`);
+        if (sec) {
+          if (t === tabId) sec.classList.remove('hidden');
+          else sec.classList.add('hidden');
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // Load Initial Server Data
+    async function loadInitialData() {
+      try {
+        // 1. Fetch Config
+        const resConfig = await fetch('/api/openrouter/config').then(r => r.json());
+        appState.activeModel = resConfig.activeModel || 'openai/gpt-4o-mini';
+        appState.openRouterKeyPresent = resConfig.openRouterKeyPresent;
+
+        // Populate Config Inputs
+        document.getElementById('openRouterKeyInput').value = resConfig.openRouterKeyMasked || '';
+        document.getElementById('tempRangeInput').value = resConfig.aiSettings?.temperature ?? 0.7;
+        document.getElementById('tempValueLabel').innerText = resConfig.aiSettings?.temperature ?? 0.7;
+        document.getElementById('maxTokensInput').value = resConfig.aiSettings?.maxTokens ?? 2048;
+        document.getElementById('maxTokensValueLabel').innerText = resConfig.aiSettings?.maxTokens ?? 2048;
+        document.getElementById('topPRangeInput').value = resConfig.aiSettings?.topP ?? 0.9;
+        document.getElementById('topPValueLabel').innerText = resConfig.aiSettings?.topP ?? 0.9;
+        document.getElementById('systemPromptTextarea').value = resConfig.systemPrompt || '';
+
+        // Status Header & Card
+        updateHeaderStatus(resConfig);
+
+        // 2. Fetch Models
+        await fetchModelsList();
+
+      } catch (err) {
+        console.error('Error loading initial config:', err);
+        showToast('Gagal memuat data awal sistem.', 'error');
+      }
+    }
+
+    function updateHeaderStatus(config) {
+      const badge = document.getElementById('headerStatusBadge');
+      const text = document.getElementById('headerStatusText');
+      const keyStatLabel = document.getElementById('statKeyLabel');
+      const keyStatDot = document.getElementById('statKeyDot');
+      const keyMasked = document.getElementById('statKeyMasked');
+      const statActive = document.getElementById('statActiveModel');
+
+      statActive.innerText = config.activeModel || 'openai/gpt-4o-mini';
+
+      if (config.openRouterKeyPresent) {
+        badge.className = 'hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+        text.innerText = 'Key Terhubung';
+        keyStatLabel.innerText = 'Terhubung';
+        keyStatDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+        keyMasked.innerText = config.openRouterKeyMasked || 'sk-or-v1-••••••';
+      } else {
+        badge.className = 'hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20';
+        text.innerText = 'Key Belum Diatur';
+        keyStatLabel.innerText = 'Belum Ada Key';
+        keyStatDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
+        keyMasked.innerText = 'Gunakan Tab API Key';
+      }
+    }
+
+    // Fetch and render models list
+    async function fetchModelsList() {
+      try {
+        const res = await fetch('/api/openrouter/models').then(r => r.json());
+        appState.models = res.models || [];
+        
+        document.getElementById('modelsCountBadge').innerText = appState.models.length;
+        document.getElementById('statTotalModels').innerText = appState.models.length;
+
+        populateModelSelects();
+        renderModelsList();
+      } catch (err) {
+        console.error('Error fetching models:', err);
+      }
+    }
+
+    function populateModelSelects() {
+      const testerSelect = document.getElementById('testerModelSelect');
+      const configSelect = document.getElementById('configActiveModelSelect');
+
+      testerSelect.innerHTML = `<option value="">(Default: ${appState.activeModel})</option>`;
+      configSelect.innerHTML = '';
+
+      appState.models.forEach(m => {
+        const opt1 = document.createElement('option');
+        opt1.value = m.id;
+        opt1.textContent = `${m.name} (${m.id})`;
+        testerSelect.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = m.id;
+        opt2.textContent = `${m.name} (${m.id})`;
+        if (m.id === appState.activeModel) opt2.selected = true;
+        configSelect.appendChild(opt2);
+      });
+    }
+
+    function renderModelsList() {
+      const container = document.getElementById('modelsGridContainer');
+      const query = (document.getElementById('modelSearchInput').value || '').toLowerCase();
+      const providerFilter = document.getElementById('modelProviderFilter').value;
+
+      const filtered = appState.models.filter(m => {
+        const matchQuery = m.id.toLowerCase().includes(query) ||
+                           m.name.toLowerCase().includes(query) ||
+                           (m.description || '').toLowerCase().includes(query) ||
+                           (m.provider || '').toLowerCase().includes(query);
+        
+        if (!matchQuery) return false;
+        if (providerFilter === 'all') return true;
+        if (providerFilter === 'custom') return Boolean(m.isCustom);
+        return (m.provider || '').toLowerCase().includes(providerFilter) || m.id.toLowerCase().startsWith(providerFilter);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-500 font-mono text-xs glass-card rounded-2xl p-6">
+            <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+            Tidak ada model yang cocok dengan pencarian atau filter.
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(m => {
+        const isActive = m.id === appState.activeModel;
+        const isEnabled = m.enabled !== false;
+
+        return `
+          <div class="glass-card glass-card-hover rounded-2xl p-5 border ${isActive ? 'border-cyan-500/50 bg-cyan-950/10' : 'border-slate-800'} flex flex-col justify-between transition-all">
+            <div>
+              <!-- Top Row: Provider & Active Badge -->
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                  ${m.provider || 'AI'}
+                </span>
+                ${isActive ? `
+                  <span class="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-semibold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    Aktif
+                  </span>
+                ` : ''}
+              </div>
+
+              <!-- Model Name & ID -->
+              <h3 class="text-sm sm:text-base font-bold text-white mb-1 tracking-tight">${m.name}</h3>
+              <div class="text-xs font-mono text-cyan-400/90 break-all mb-2">${m.id}</div>
+
+              <!-- Description -->
+              <p class="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">${m.description || 'Tidak ada deskripsi.'}</p>
+            </div>
+
+            <!-- Bottom Stats & Actions -->
+            <div class="pt-3 border-t border-slate-800/80 space-y-3">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>Context: ${(m.context_length ? (m.context_length / 1000).toFixed(0) + 'k' : '128k')}</span>
+                <span class="text-slate-300">${typeof m.pricing === 'string' ? m.pricing : 'Standard'}</span>
+              </div>
+
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1">
+                  ${!isActive ? `
+                    <button onclick="setActiveModel('${m.id}')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-slate-200 text-xs font-medium transition-all" title="Jadikan Model Utama">
+                      Set Aktif
+                    </button>
+                  ` : ''}
+                  <button onclick="testInPlayground('${m.id}')" class="px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-cyan-400 text-xs" title="Coba di Tester">
+                    <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-1">
+                  <button onclick="openEditModal('${m.id}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300" title="Edit Model">
+                    <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button onclick="deleteModel('${m.id}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-900/50 text-rose-400" title="Hapus Model">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Set Active Model
+    async function setActiveModel(modelId) {
+      try {
+        const res = await fetch(`/api/openrouter/models/${encodeURIComponent(modelId)}/active`, {
+          method: 'POST',
+        }).then(r => r.json());
+
+        if (res.success) {
+          appState.activeModel = modelId;
+          document.getElementById('statActiveModel').innerText = modelId;
+          showToast(`Model aktif diubah ke: ${modelId}`, 'success');
+          populateModelSelects();
+          renderModelsList();
+          updateGeneratedUrl();
+        } else {
+          showToast(res.error || 'Gagal mengubah model aktif.', 'error');
+        }
+      } catch (err) {
+        showToast('Error koneksi saat mengganti model.', 'error');
+      }
+    }
+
+    // Delete Model
+    async function deleteModel(modelId) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus model "${modelId}"?`)) return;
+
+      try {
+        const res = await fetch(`/api/openrouter/models/${encodeURIComponent(modelId)}`, {
+          method: 'DELETE',
+        }).then(r => r.json());
+
+        if (res.success) {
+          showToast(`Model "${modelId}" berhasil dihapus.`, 'success');
+          await fetchModelsList();
+        } else {
+          showToast(res.error || 'Gagal menghapus model.', 'error');
+        }
+      } catch (err) {
+        showToast('Error koneksi saat menghapus model.', 'error');
+      }
+    }
+
+    // Reset models to defaults
+    async function resetModelsToDefault() {
+      if (!confirm('Kembalikan seluruh daftar model ke rekomendasi bawaan?')) return;
+      try {
+        const res = await fetch('/api/openrouter/models/reset', { method: 'POST' }).then(r => r.json());
+        if (res.success) {
+          showToast('Daftar model berhasil dikembalikan ke bawaan.', 'success');
+          await fetchModelsList();
+        }
+      } catch (err) {
+        showToast('Gagal mereset model.', 'error');
+      }
+    }
+
+    // Open Add Modal
+    function openAddModal() {
+      document.getElementById('addModelForm').reset();
+      document.getElementById('addModelModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeAddModal() {
+      document.getElementById('addModelModal').classList.add('hidden');
+    }
+
+    function fillAddPreset(id, name, provider, desc, context) {
+      document.getElementById('addModelId').value = id;
+      document.getElementById('addModelName').value = name;
+      document.getElementById('addModelProvider').value = provider;
+      document.getElementById('addModelDescription').value = desc;
+      document.getElementById('addModelContext').value = context;
+    }
+
+    async function handleAddModelSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('addModelId').value.trim();
+      const name = document.getElementById('addModelName').value.trim();
+      const provider = document.getElementById('addModelProvider').value.trim();
+      const description = document.getElementById('addModelDescription').value.trim();
+      const context_length = Number(document.getElementById('addModelContext').value) || 128000;
+      const pricing = document.getElementById('addModelPricing').value.trim() || 'Standard';
+
+      try {
+        const res = await fetch('/api/openrouter/models', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name, provider, description, context_length, pricing }),
+        }).then(r => r.json());
+
+        if (res.success) {
+          showToast(`Model "${id}" berhasil ditambahkan!`, 'success');
+          closeAddModal();
+          await fetchModelsList();
+        } else {
+          showToast(res.error || 'Gagal menambahkan model.', 'error');
+        }
+      } catch (err) {
+        showToast('Error koneksi saat menambahkan model.', 'error');
+      }
+    }
+
+    // Edit Modal
+    function openEditModal(modelId) {
+      const model = appState.models.find(m => m.id === modelId);
+      if (!model) return;
+
+      document.getElementById('editOriginalId').value = model.id;
+      document.getElementById('editModelId').value = model.id;
+      document.getElementById('editModelName').value = model.name;
+      document.getElementById('editModelProvider').value = model.provider || '';
+      document.getElementById('editModelContext').value = model.context_length || 128000;
+      document.getElementById('editModelEnabled').value = model.enabled !== false ? 'true' : 'false';
+      document.getElementById('editModelDescription').value = model.description || '';
+
+      document.getElementById('editModelModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeEditModal() {
+      document.getElementById('editModelModal').classList.add('hidden');
+    }
+
+    async function handleEditModelSubmit(e) {
+      e.preventDefault();
+      const originalId = document.getElementById('editOriginalId').value;
+      const id = document.getElementById('editModelId').value.trim();
+      const name = document.getElementById('editModelName').value.trim();
+      const provider = document.getElementById('editModelProvider').value.trim();
+      const context_length = Number(document.getElementById('editModelContext').value) || 128000;
+      const enabled = document.getElementById('editModelEnabled').value === 'true';
+      const description = document.getElementById('editModelDescription').value.trim();
+
+      try {
+        const res = await fetch(`/api/openrouter/models/${encodeURIComponent(originalId)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name, provider, context_length, enabled, description }),
+        }).then(r => r.json());
+
+        if (res.success) {
+          showToast('Model berhasil diperbarui.', 'success');
+          closeEditModal();
+          await fetchModelsList();
+        } else {
+          showToast(res.error || 'Gagal memperbarui model.', 'error');
+        }
+      } catch (err) {
+        showToast('Error koneksi saat mengedit model.', 'error');
+      }
+    }
+
+    // Browse Live Catalogue Modal
+    function openSyncCatalogueModal() {
+      document.getElementById('syncCatalogueModal').classList.remove('hidden');
+      lucide.createIcons();
+      if (appState.catalogueModels.length === 0) {
+        fetchLiveCatalogue();
+      }
+    }
+    function closeSyncModal() {
+      document.getElementById('syncCatalogueModal').classList.add('hidden');
+    }
+
+    async function fetchLiveCatalogue() {
+      const container = document.getElementById('catalogueItemsContainer');
+      const icon = document.getElementById('catalogueRefreshIcon');
+      icon.classList.add('animate-spin');
+      container.innerHTML = '<div class="p-8 text-center text-slate-400 text-xs font-mono">Mengambil data katalog live dari API OpenRouter...</div>';
+
+      try {
+        const res = await fetch('/api/openrouter/models/sync-live', { method: 'POST' }).then(r => r.json());
+        appState.catalogueModels = res.models || [];
+        renderCatalogueList();
+      } catch (err) {
+        container.innerHTML = '<div class="p-8 text-center text-rose-400 text-xs font-mono">Gagal mengambil katalog dari OpenRouter. Periksa koneksi atau API key Anda.</div>';
+      } finally {
+        icon.classList.remove('animate-spin');
+      }
+    }
+
+    function renderCatalogueList() {
+      const container = document.getElementById('catalogueItemsContainer');
+      const query = (document.getElementById('catalogueSearchInput').value || '').toLowerCase();
+
+      const filtered = appState.catalogueModels.filter(m => {
+        return m.id.toLowerCase().includes(query) || (m.name || '').toLowerCase().includes(query) || (m.description || '').toLowerCase().includes(query);
+      });
+
+      document.getElementById('catalogueCountLabel').innerText = `Ditemukan ${filtered.length} model`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-500 text-xs font-mono">Tidak ada model yang cocok.</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.slice(0, 100).map(m => {
+        const isAlreadyAdded = appState.models.some(existing => existing.id.toLowerCase() === m.id.toLowerCase());
+
+        return `
+          <div class="p-3.5 flex items-center justify-between gap-3 hover:bg-slate-800/40 transition-colors">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="text-xs font-bold text-white truncate">${m.name || m.id}</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-cyan-300">${m.provider || 'OpenRouter'}</span>
+              </div>
+              <div class="text-[11px] font-mono text-slate-400 truncate">${m.id}</div>
+              <p class="text-[11px] text-slate-500 line-clamp-1 mt-0.5">${m.description || ''}</p>
+            </div>
+
+            <div class="shrink-0">
+              ${isAlreadyAdded ? `
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-800 text-emerald-400 flex items-center gap-1">
+                  <i data-lucide="check" class="w-3 h-3"></i>
+                  Terpasang
+                </span>
+              ` : `
+                <button onclick="addFromCatalogue('${m.id}', '${(m.name || m.id).replace(/'/g, "\\'")}', '${m.provider || 'OpenRouter'}', '${(m.description || '').replace(/'/g, "\\'")}', ${m.context_length || 128000})" class="px-3 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500 hover:text-slate-950 text-cyan-300 text-xs font-medium border border-cyan-500/30 transition-all flex items-center gap-1">
+                  <i data-lucide="plus" class="w-3 h-3"></i>
+                  <span>Import</span>
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    async function addFromCatalogue(id, name, provider, description, context_length) {
+      try {
+        const res = await fetch('/api/openrouter/models', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name, provider, description, context_length, pricing: 'OpenRouter' }),
+        }).then(r => r.json());
+
+        if (res.success) {
+          showToast(`Model "${id}" berhasil diimport!`, 'success');
+          await fetchModelsList();
+          renderCatalogueList();
+        }
+      } catch (err) {
+        showToast('Gagal mengimport model.', 'error');
+      }
+    }
+
+    // Test in Playground
+    function testInPlayground(modelId) {
+      switchTab('dashboard');
+      document.getElementById('testerModelSelect').value = modelId;
+      updateGeneratedUrl();
+      document.getElementById('testerPromptInput').focus();
+    }
+
+    // Update Live URL
+    function updateGeneratedUrl() {
+      const prompt = document.getElementById('testerPromptInput').value.trim() || 'Halo';
+      const model = document.getElementById('testerModelSelect').value;
+      const isJson = appState.outputFormat === 'json';
+
+      let url = `${window.location.origin}/api/openr?text=${encodeURIComponent(prompt)}`;
+      if (model) url += `&model=${encodeURIComponent(model)}`;
+      if (isJson) url += `&json=true`;
+
+      document.getElementById('generatedUrlBox').innerText = url;
+    }
+
+    function setOutputFormat(format) {
+      appState.outputFormat = format;
+      const textBtn = document.getElementById('formatTextBtn');
+      const jsonBtn = document.getElementById('formatJsonBtn');
+
+      if (format === 'text') {
+        textBtn.className = 'px-2 py-1 rounded bg-cyan-500/20 text-cyan-300 font-semibold border border-cyan-500/30';
+        jsonBtn.className = 'px-2 py-1 rounded text-slate-400 hover:text-white';
+      } else {
+        jsonBtn.className = 'px-2 py-1 rounded bg-cyan-500/20 text-cyan-300 font-semibold border border-cyan-500/30';
+        textBtn.className = 'px-2 py-1 rounded text-slate-400 hover:text-white';
+      }
+      updateGeneratedUrl();
+      updateCodeSnippet();
+    }
+
+    // Run GET Test
+    async function runGetTest() {
+      const prompt = document.getElementById('testerPromptInput').value.trim();
+      const model = document.getElementById('testerModelSelect').value;
+      const isJson = appState.outputFormat === 'json';
+      const outputBox = document.getElementById('responseOutputBox');
+      const statusLabel = document.getElementById('responseStatus');
+      const latencyLabel = document.getElementById('responseLatency');
+      const submitBtn = document.getElementById('testerSubmitBtn');
+
+      if (!prompt) {
+        showToast('Silakan masukkan prompt / pertanyaan.', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="w-3 h-3 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>';
+      outputBox.innerHTML = '<span class="text-cyan-400 animate-pulse">Menghubungi OpenRouter API... Mohon tunggu...</span>';
+      statusLabel.innerText = 'Status: Fetching...';
+      latencyLabel.innerText = 'Latency: ...';
+
+      const startTime = performance.now();
+
+      try {
+        let fetchUrl = `/api/openr?text=${encodeURIComponent(prompt)}`;
+        if (model) fetchUrl += `&model=${encodeURIComponent(model)}`;
+        if (isJson) fetchUrl += `&json=true`;
+
+        const response = await fetch(fetchUrl);
+        const duration = Math.round(performance.now() - startTime);
+
+        latencyLabel.innerText = `Latency: ${duration}ms`;
+        statusLabel.innerText = `Status: ${response.status} ${response.statusText}`;
+
+        if (!response.ok) {
+          const errText = await response.text();
+          outputBox.innerHTML = `<span class="text-rose-400">Error ${response.status}:\n${errText}</span>`;
+          showToast('Permintaan gagal. Periksa respon error.', 'error');
+          return;
+        }
+
+        if (isJson) {
+          const json = await response.json();
+          outputBox.innerText = JSON.stringify(json, null, 2);
+        } else {
+          const text = await response.text();
+          outputBox.innerText = text;
+        }
+
+        showToast('Respon berhasil diterima!', 'success');
+      } catch (err) {
+        outputBox.innerHTML = `<span class="text-rose-400">Network Error: ${err.message}</span>`;
+        statusLabel.innerText = 'Status: Network Failed';
+        showToast('Gagal menghubungi server.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="send" class="w-3.5 h-3.5"></i><span>Kirim GET</span>';
+        lucide.createIcons();
+      }
+    }
+
+    // Save OpenRouter Configuration
+    async function saveOpenRouterConfig() {
+      const apiKey = document.getElementById('openRouterKeyInput').value.trim();
+      const activeModel = document.getElementById('configActiveModelSelect').value;
+      const temperature = parseFloat(document.getElementById('tempRangeInput').value);
+      const maxTokens = parseInt(document.getElementById('maxTokensInput').value, 10);
+      const topP = parseFloat(document.getElementById('topPRangeInput').value);
+      const systemPrompt = document.getElementById('systemPromptTextarea').value;
+
+      const saveBtn = document.getElementById('saveConfigBtn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span> Menyimpan...';
+
+      try {
+        const res = await fetch('/api/openrouter/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey, activeModel, temperature, maxTokens, topP, systemPrompt }),
+        }).then(r => r.json());
+
+        if (res.success) {
+          showToast('Konfigurasi OpenRouter berhasil disimpan!', 'success');
+          await loadInitialData();
+        } else {
+          showToast(res.error || 'Gagal menyimpan konfigurasi.', 'error');
+        }
+      } catch (err) {
+        showToast('Error koneksi saat menyimpan konfigurasi.', 'error');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i><span>Simpan Konfigurasi</span>';
+        lucide.createIcons();
+      }
+    }
+
+    // Test API Key Live
+    async function testKeyConnection() {
+      const apiKey = document.getElementById('openRouterKeyInput').value.trim();
+      const feedback = document.getElementById('keyStatusFeedback');
+      const testBtn = document.getElementById('testKeyBtn');
+
+      testBtn.disabled = true;
+      testBtn.innerHTML = '<span class="w-3 h-3 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></span>';
+      feedback.innerHTML = '<span class="text-slate-400">Menguji API Key dengan OpenRouter...</span>';
+
+      try {
+        const res = await fetch('/api/openrouter/test-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey }),
+        }).then(r => r.json());
+
+        if (res.success) {
+          feedback.innerHTML = `<span class="text-emerald-400 flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ${res.message}</span>`;
+          showToast('API Key Valid & Aktif!', 'success');
+        } else {
+          feedback.innerHTML = `<span class="text-rose-400 flex items-center gap-1"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> ${res.message}</span>`;
+          showToast(res.message, 'error');
+        }
+      } catch (err) {
+        feedback.innerHTML = `<span class="text-rose-400">Error: ${err.message}</span>`;
+      } finally {
+        testBtn.disabled = false;
+        testBtn.innerHTML = '<i data-lucide="activity" class="w-3.5 h-3.5 text-cyan-400"></i><span>Test Koneksi</span>';
+        lucide.createIcons();
+      }
+    }
+
+    function toggleKeyVisibility() {
+      const input = document.getElementById('openRouterKeyInput');
+      const icon = document.getElementById('keyEyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    function resetSystemPrompt() {
+      document.getElementById('systemPromptTextarea').value = `You are LYNXIEE MARKET AI.
+You are a helpful, intelligent and friendly AI assistant created for LYNXIEE MARKET.
+
+Key instructions:
+- Answer users clearly, accurately, and politely in their requested language (default to Indonesian or English according to the user query).
+- Can explain complex school or university subjects simply.
+- Can write, debug, and explain clean, production-ready code with concise explanations.
+- Can summarize documents, brainstorm creative ideas, and formulate structured plans.
+- If you are not sure or lack verified facts, honestly state that you do not know instead of hallucinating.
+- Format responses beautifully using clean Markdown, bold headers, bullet lists, and code blocks with syntax highlighting where relevant.`;
+      showToast('System prompt dikembalikan ke bawaan.', 'info');
+    }
+
+    function applyPresetPrompt(type) {
+      const presets = {
+        assistant: `You are LYNXIEE MARKET AI, a helpful, polite, and comprehensive AI assistant. Answer in clear Indonesian or English with Markdown formatting.`,
+        coder: `You are a Senior Principal Software Engineer at LYNXIEE MARKET. Always write clean, production-ready, well-typed TypeScript, Python, or requested language code. Prioritize concise explanations and correct code blocks.`,
+        academic: `You are a patient and brilliant university professor. Explain complex scientific, mathematical, and academic concepts using simple analogies, structured step-by-step breakdowns, and clear examples.`,
+        concise: `You are an ultra-concise, direct AI assistant. Answer queries in 1-3 bullet points or short sentences. Never add filler intro or concluding pleasantries.`
+      };
+      if (presets[type]) {
+        document.getElementById('systemPromptTextarea').value = presets[type];
+        showToast('Template prompt diterapkan!', 'success');
+      }
+    }
+
+    // Code Snippets for GET API
+    let currentLanguage = 'curl';
+    function showCodeSnippet(lang) {
+      currentLanguage = lang;
+      document.querySelectorAll('.snippet-tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-cyan-500/20', 'text-cyan-300', 'border', 'border-cyan-500/30');
+        btn.classList.add('text-slate-400');
+      });
+      event?.target?.classList.add('active', 'bg-cyan-500/20', 'text-cyan-300', 'border', 'border-cyan-500/30');
+      updateCodeSnippet();
+    }
+
+    function updateCodeSnippet() {
+      const baseUrl = window.location.origin;
+      const model = appState.activeModel;
+      const isJson = appState.outputFormat === 'json';
+      const box = document.getElementById('codeSnippetBox');
+
+      if (currentLanguage === 'curl') {
+        box.innerText = `# 1. Contoh GET Request Langsung (Teks Murni)
+curl -G "${baseUrl}/api/openr" \\
+  --data-urlencode "text=Halo apa kabar?" \\
+  --data-urlencode "model=${model}"
+
+# 2. Contoh dengan format JSON
+curl -G "${baseUrl}/api/openr" \\
+  --data-urlencode "text=Siapa kamu?" \\
+  --data-urlencode "json=true"`;
+      } else if (currentLanguage === 'js') {
+        box.innerText = `// JavaScript / Node.js (Fetch API)
+async function tanyaLynxieeAI(prompt) {
+  const url = new URL('${baseUrl}/api/openr');
+  url.searchParams.set('text', prompt);
+  url.searchParams.set('model', '${model}');
+
+  const response = await fetch(url);
+  const textResponse = await response.text();
+  console.log("Respon AI:", textResponse);
+  return textResponse;
+}
+
+// Contoh Pemanggilan:
+tanyaLynxieeAI("Jelaskan teknologi AI di 2026");`;
+      } else if (currentLanguage === 'python') {
+        box.innerText = `# Python (requests)
+import requests
+
+def tanya_ai(prompt: str, model: str = "${model}"):
+    url = "${baseUrl}/api/openr"
+    params = {
+        "text": prompt,
+        "model": model
+    }
+    response = requests.get(url, params=params)
+    return response.text
+
+# Eksekusi:
+jawaban = tanya_ai("Tuliskan fungsi binary search dalam Python")
+print(jawaban)`;
+      } else if (currentLanguage === 'php') {
+        box.innerText = `<?php
+// PHP Script
+function tanyaLynxieeAI($prompt, $model = "${model}") {
+    $baseUrl = "${baseUrl}/api/openr";
+    $query = http_build_query([
+        'text' => $prompt,
+        'model' => $model
+    ]);
+    
+    $response = file_get_contents($baseUrl . '?' . $query);
+    return $response;
+}
+
+// Panggil:
+$hasil = tanyaLynxieeAI("Sebutkan 3 tips produktivitas");
+echo $hasil;
+?>`;
+      }
+    }
+
+    // Helpers & Copy
+    function copyGeneratedUrl() {
+      const url = document.getElementById('generatedUrlBox').innerText;
+      navigator.clipboard.writeText(url);
+      const text = document.getElementById('copyUrlText');
+      text.innerText = 'Tersalin!';
+      setTimeout(() => text.innerText = 'Salin URL', 2000);
+      showToast('URL Endpoint berhasil disalin!', 'success');
+    }
+
+    function openGeneratedUrlInNewTab() {
+      const url = document.getElementById('generatedUrlBox').innerText;
+      window.open(url, '_blank');
+    }
+
+    function copyResponseText() {
+      const text = document.getElementById('responseOutputBox').innerText;
+      navigator.clipboard.writeText(text);
+      showToast('Teks jawaban berhasil disalin!', 'success');
+    }
+
+    function copyCurrentCodeSnippet() {
+      const code = document.getElementById('codeSnippetBox').innerText;
+      navigator.clipboard.writeText(code);
+      const label = document.getElementById('copySnippetText');
+      label.innerText = 'Tersalin!';
+      setTimeout(() => label.innerText = 'Salin Kode', 2000);
+      showToast('Snippet kode berhasil disalin!', 'success');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const bg = type === 'success' ? 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200' :
+                 type === 'error' ? 'bg-rose-950/90 border-rose-500/40 text-rose-200' :
+                 'bg-slate-900/90 border-slate-700 text-slate-200';
+
+      toast.className = `p-3.5 rounded-xl border ${bg} backdrop-blur-md shadow-2xl text-xs font-medium transition-all transform duration-300 pointer-events-auto flex items-center gap-2 max-w-sm`;
+      toast.innerHTML = `<span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+  </script>
+</body>
+</html>

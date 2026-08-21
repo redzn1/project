@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/openr",
+      "destination": "/api"
+    },
+    {
+      "source": "/openr.html",
+      "destination": "/api"
+    },
+    {
+      "source": "/((?!api|openr|assets|favicon|logo).*\\..*)",
+      "destination": "/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

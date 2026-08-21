@@ -1,0 +1,405 @@
+{
+  "adminPassword": "LYNXIEE MARKET",
+  "activeProvider": "mayzaa",
+  "activeModel": "mayzaa-chatgpt",
+  "openRouterApiKey": "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",
+  "openRouterBaseUrl": "https://openrouter.ai/api/v1",
+  "mayzaaApiUrl": "https://api.mayzaa.my.id/api/ai/chat-gpt?text=",
+  "customApiUrl": "https://api.mayzaa.my.id/api/ai/chat-gpt?text=",
+  "xkiroApiKey": "",
+  "xkiroBaseUrl": "https://api.xkiro.com/v1",
+  "xkiroModel": "openai/gpt-4o-mini",
+  "systemPrompt": "You are LYNXIEE MARKET AI.\nYou are a helpful, intelligent and friendly AI assistant created for LYNXIEE MARKET.\n\nKey instructions:\n- Answer users clearly, accurately, and politely in their requested language (default to Indonesian or English according to the user query).\n- Can explain complex school or university subjects simply.\n- Can write, debug, and explain clean, production-ready code with concise explanations.\n- Can summarize documents, brainstorm creative ideas, and formulate structured plans.\n- If you are not sure or lack verified facts, honestly state that you do not know instead of hallucinating.\n- Format responses beautifully using clean Markdown, bold headers, bullet lists, and code blocks with syntax highlighting where relevant.",
+  "systemPromptEnabled": true,
+  "safetyFilterLevel": "medium",
+  "openRouterModels": [
+    {
+      "id": "openai/gpt-4o-mini",
+      "name": "GPT-4o Mini (OpenAI)",
+      "provider": "OpenAI",
+      "description": "Fast, highly intelligent model for lightweight tasks and everyday conversations.",
+      "context_length": 128000,
+      "pricing": {
+        "prompt": "$0.00000015",
+        "completion": "$0.0000006"
+      },
+      "enabled": true
+    },
+    {
+      "id": "openai/gpt-4o",
+      "name": "GPT-4o (OpenAI)",
+      "provider": "OpenAI",
+      "description": "Flagship versatile multimodal model by OpenAI.",
+      "context_length": 128000,
+      "pricing": {
+        "prompt": "$0.0000025",
+        "completion": "$0.00001"
+      },
+      "enabled": true
+    },
+    {
+      "id": "anthropic/claude-3.5-sonnet",
+      "name": "Claude 3.5 Sonnet (Anthropic)",
+      "provider": "Anthropic",
+      "description": "Superior reasoning, coding, and creative writing abilities.",
+      "context_length": 200000,
+      "pricing": {
+        "prompt": "$0.000003",
+        "completion": "$0.000015"
+      },
+      "enabled": true
+    },
+    {
+      "id": "deepseek/deepseek-chat",
+      "name": "DeepSeek V3 (DeepSeek)",
+      "provider": "DeepSeek",
+      "description": "Powerful, economical open-weights frontier model.",
+      "context_length": 64000,
+      "pricing": {
+        "prompt": "$0.00000014",
+        "completion": "$0.00000028"
+      },
+      "enabled": true
+    },
+    {
+      "id": "deepseek/deepseek-r1",
+      "name": "DeepSeek R1 Reasoning (DeepSeek)",
+      "provider": "DeepSeek",
+      "description": "Advanced reasoning model with deep chain-of-thought logic.",
+      "context_length": 64000,
+      "pricing": {
+        "prompt": "$0.00000055",
+        "completion": "$0.00000219"
+      },
+      "enabled": true
+    },
+    {
+      "id": "google/gemini-2.0-flash-001",
+      "name": "Gemini 2.0 Flash (Google)",
+      "provider": "Google",
+      "description": "Ultra fast response times with multimodal agility and large context.",
+      "context_length": 1000000,
+      "pricing": {
+        "prompt": "$0.0000001",
+        "completion": "$0.0000004"
+      },
+      "enabled": true
+    },
+    {
+      "id": "meta-llama/llama-3.3-70b-instruct",
+      "name": "Llama 3.3 70B Instruct (Meta)",
+      "provider": "Meta",
+      "description": "Open-weight powerhouse with industry-leading reasoning performance.",
+      "context_length": 128000,
+      "pricing": {
+        "prompt": "$0.00000012",
+        "completion": "$0.0000003"
+      },
+      "enabled": true
+    },
+    {
+      "id": "qwen/qwen-2.5-72b-instruct",
+      "name": "Qwen 2.5 72B Instruct (Alibaba)",
+      "provider": "Qwen",
+      "description": "Exceptional open multilingual reasoning and math capabilities.",
+      "context_length": 128000,
+      "pricing": {
+        "prompt": "$0.00000035",
+        "completion": "$0.0000004"
+      },
+      "enabled": true
+    },
+    {
+      "id": "mistralai/mistral-large-2411",
+      "name": "Mistral Large (Mistral AI)",
+      "provider": "Mistral AI",
+      "description": "Top-tier reasoning, multilingual capabilities, and coding precision.",
+      "context_length": 128000,
+      "pricing": {
+        "prompt": "$0.000002",
+        "completion": "$0.000006"
+      },
+      "enabled": true
+    },
+    {
+      "id": "mayzaa-chatgpt",
+      "name": "Mayzaa ChatGPT Endpoint",
+      "provider": "Mayzaa AI",
+      "description": "Direct AI chat endpoint hosted by Mayzaa API (https://api.mayzaa.my.id).",
+      "context_length": 16000,
+      "pricing": {
+        "prompt": "Free",
+        "completion": "Free"
+      },
+      "enabled": true
+    }
+  ],
+  "aiSettings": {
+    "temperature": 0.7,
+    "maxTokens": 2048,
+    "topP": 0.9
+  },
+  "systemStats": {
+    "totalRequests": 26,
+    "successfulRequests": 17,
+    "failedRequests": 9,
+    "totalTokens": 34,
+    "inputTokens": 28,
+    "outputTokens": 6,
+    "latencyHistory": [
+      4165,
+      5381,
+      5043,
+      4312,
+      4116,
+      5742
+    ],
+    "startedAt": 1786805126683,
+    "lastActiveAt": 1787311517948
+  },
+  "logs": [
+    {
+      "id": "log_1787311517948_dd2y3n",
+      "timestamp": 1787311517948,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "siapa kamu, model kamu, pembuat mu",
+      "status": 200,
+      "latencyMs": 5742
+    },
+    {
+      "id": "log_1787311483855_05nz68",
+      "timestamp": 1787311483855,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "siapa kamu",
+      "status": 200,
+      "latencyMs": 4116
+    },
+    {
+      "id": "log_1787311461820_6fppto",
+      "timestamp": 1787311461820,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "with Indonesian language",
+      "status": 200,
+      "latencyMs": 4312
+    },
+    {
+      "id": "log_1787311435181_ce4s9h",
+      "timestamp": 1787311435181,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "Halow who are you",
+      "status": 200,
+      "latencyMs": 5043
+    },
+    {
+      "id": "log_1787311158673_xkrlb7",
+      "timestamp": 1787311158673,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "siapa kamu sebenarnya",
+      "status": 200,
+      "latencyMs": 5381
+    },
+    {
+      "id": "log_1787311035114_1341e6",
+      "timestamp": 1787311035114,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "Halow",
+      "status": 200,
+      "latencyMs": 4165
+    },
+    {
+      "id": "log_1786864214594_mt4pul",
+      "timestamp": 1786864214594,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "Halo",
+      "status": 500,
+      "latencyMs": 461,
+      "error": "This request requires more credits, or fewer max_tokens. You requested up to 2048 tokens, but can only afford 1827. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account"
+    },
+    {
+      "id": "log_1786863562077_x1iik8",
+      "timestamp": 1786863562077,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "halo",
+      "status": 500,
+      "latencyMs": 255,
+      "error": "Request failed with status code 402"
+    },
+    {
+      "id": "log_1786863551024_zye6bh",
+      "timestamp": 1786863551024,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "Buatkan struktur website landing page modern menggunakan HTML5, Tailwind CSS, dan JavaScript interak",
+      "status": 500,
+      "latencyMs": 450,
+      "error": "Request failed with status code 402"
+    },
+    {
+      "id": "log_1786863533129_0y8xsy",
+      "timestamp": 1786863533129,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "siapa tuan kamu?",
+      "status": 500,
+      "latencyMs": 97,
+      "error": "Request failed with status code 402"
+    },
+    {
+      "id": "log_1786863501706_obe8th",
+      "timestamp": 1786863501706,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "halo  siapa kamu ?",
+      "status": 500,
+      "latencyMs": 611,
+      "error": "Request failed with status code 402"
+    },
+    {
+      "id": "log_1786861864879_4235q6",
+      "timestamp": 1786861864879,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "apa kelebihan kamu?",
+      "status": 500,
+      "latencyMs": 282,
+      "error": "Request failed with status code 402"
+    },
+    {
+      "id": "log_1786861099580_kun2g3",
+      "timestamp": 1786861099580,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "apa arti WHAT dalam bahasa Inggris",
+      "status": 200,
+      "latencyMs": 7595
+    },
+    {
+      "id": "log_1786861069215_egz9b0",
+      "timestamp": 1786861069215,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "buat menjadi bahasa Indonesia",
+      "status": 200,
+      "latencyMs": 6017
+    },
+    {
+      "id": "log_1786860925502_vxmlck",
+      "timestamp": 1786860925502,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "halo siapa tuan anda?",
+      "status": 200,
+      "latencyMs": 5407
+    },
+    {
+      "id": "log_1786860839338_e6q558",
+      "timestamp": 1786860839338,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "perkenalkan diri anda",
+      "status": 200,
+      "latencyMs": 6994
+    },
+    {
+      "id": "log_1786860620132_024oit",
+      "timestamp": 1786860620132,
+      "provider": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "promptSnippet": "perkenalkan diri anda",
+      "status": 200,
+      "latencyMs": 7777
+    },
+    {
+      "id": "log_1786854338456_cww52a",
+      "timestamp": 1786854338456,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "buatkan saya sebuah permainan sederhana dan berhasil 100%",
+      "status": 200,
+      "latencyMs": 6559
+    },
+    {
+      "id": "log_1786854167660_gbu7bm",
+      "timestamp": 1786854167660,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "buatkan saya kode html simple",
+      "status": 200,
+      "latencyMs": 8863
+    },
+    {
+      "id": "log_1786853971516_q901ro",
+      "timestamp": 1786853971516,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "siapa kamu?",
+      "status": 200,
+      "latencyMs": 3209
+    },
+    {
+      "id": "log_1786853957869_i1dlqp",
+      "timestamp": 1786853957869,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "sama kamu?",
+      "status": 200,
+      "latencyMs": 2094
+    },
+    {
+      "id": "log_1786853946861_2bf6bq",
+      "timestamp": 1786853946861,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "halo",
+      "status": 200,
+      "latencyMs": 2905
+    },
+    {
+      "id": "log_1786806672210_40cekf",
+      "timestamp": 1786806672210,
+      "provider": "gemini",
+      "model": "gemini-3.7-flash",
+      "promptSnippet": "halo",
+      "status": 200,
+      "latencyMs": 4464
+    },
+    {
+      "id": "log_1786806357960_3hr4sd",
+      "timestamp": 1786806357960,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "halo",
+      "status": 500,
+      "latencyMs": 5718,
+      "error": "Primary (mayzaa) and Fallback failed: {\"error\":{\"message\":\"{\\n  \\\"error\\\": {\\n    \\\"code\\\": 503,\\n    \\\"message\\\": \\\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\\\",\\n    \\\"status\\\": \\\"UNAVAILABLE\\\"\\n  }\\n}\\n\",\"code\":503,\"status\":\"Service Unavailable\"}}"
+    },
+    {
+      "id": "log_1786805971372_x9c4gy",
+      "timestamp": 1786805971372,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "perkenalkan diri kamu",
+      "status": 500,
+      "latencyMs": 2241,
+      "error": "Primary (mayzaa) and Fallback failed: {\"error\":{\"message\":\"{\\n  \\\"error\\\": {\\n    \\\"code\\\": 503,\\n    \\\"message\\\": \\\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\\\",\\n    \\\"status\\\": \\\"UNAVAILABLE\\\"\\n  }\\n}\\n\",\"code\":503,\"status\":\"Service Unavailable\"}}"
+    },
+    {
+      "id": "log_1786805956475_408scx",
+      "timestamp": 1786805956475,
+      "provider": "mayzaa",
+      "model": "mayzaa-chatgpt",
+      "promptSnippet": "halo",
+      "status": 500,
+      "latencyMs": 16340,
+      "error": "Primary (mayzaa) and Fallback failed: {\"error\":{\"message\":\"{\\n  \\\"error\\\": {\\n    \\\"code\\\": 503,\\n    \\\"message\\\": \\\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\\\",\\n    \\\"status\\\": \\\"UNAVAILABLE\\\"\\n  }\\n}\\n\",\"code\":503,\"status\":\"Service Unavailable\"}}"
+    }
+  ]
+}
